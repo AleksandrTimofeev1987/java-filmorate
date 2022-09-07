@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -37,39 +36,43 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @AfterEach
-    public void afterEach() {
-        userController.getUsers().clear();
-        userController.setId(0);
-    }
-
     // Проверка добавления валидного пользователя
     @Test
-    public void userWhenPostThenStatus200andUserReturned() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenValidUserWhenPostThenStatus200andUserReturned() throws Exception {
+        //when
         mockMvc.perform(
                 post("/users")
                         .content(objectMapper.writeValueAsString(VALID_USER))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("1@yandex.ru"))
                 .andExpect(jsonPath("$.login").value("login"))
+                .andExpect(jsonPath("$.birthday").value(BIRTHDAY.toString()))
                 .andExpect(jsonPath("$.name").value("name"));
     }
 
     // Проверка обновления валидного пользователя
     @Test
-    public void userWhenPutThenStatus200andUserReturned() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenValidUserWhenPutThenStatus200andUserReturned() throws Exception {
+        //given
         postValidUser();
 
         User updatedUser = new User(1, "12@yandex.ru", "new_login", "new_name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("12@yandex.ru"))
@@ -79,14 +82,19 @@ public class UserControllerTest {
 
     // Проверка добавления валидного пользователя с пустым именем
     @Test
-    public void userWhenPostWithBlankNameThenStatus200andUserReturnedWithNameLogin() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithBlankNameWhenPostThenStatus200andUserReturnedWithNameLogin() throws Exception {
+        //given
         User user = new User(1, "1@yandex.ru", "login", "", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 post("/users")
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("1@yandex.ru"))
@@ -96,16 +104,21 @@ public class UserControllerTest {
 
     // Проверка обновления валидного пользователя с пустым именем
     @Test
-    public void userWhenPutWithBlankNameThenStatus200andUserReturnedWithNameLogin() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithBlankNameWhenPutThenStatus200andUserReturnedWithNameLogin() throws Exception {
+        //given
         postValidUser();
 
         User updatedUser = new User(1, "12@yandex.ru", "new_login", "", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("12@yandex.ru"))
@@ -113,52 +126,23 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name").value("new_login"));
     }
 
-    // Проверка добавления пользователя с логином, сожержащим пробел (ожидается статус 400 Bad Request и UserValidationException)
-    @Test
-    public void userWhenPostWithSpaceInLoginThenStatus400andUserValidationException() throws Exception {
-        User user = new User(1, "1@yandex.ru", "l ogin", "name", BIRTHDAY);
-
-        mockMvc.perform(
-                post("/users")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserValidationException))
-                .andExpect(result -> assertEquals("Логин не должен содержать пробелы.",
-                        result.getResolvedException().getMessage()));
-    }
-
-    // Проверка обновления пользователя с логином, сожержащим пробел (ожидается статус 400 Bad Request и UserValidationException)
-    @Test
-    public void userWhenPutWithSpaceInLoginThenStatus400andUserValidationException() throws Exception {
-        postValidUser();
-
-        User updatedUser = new User(1, "1@yandex.ru", "l ogin", "name", BIRTHDAY);
-
-        mockMvc.perform(
-                put("/users")
-                        .content(objectMapper.writeValueAsString(updatedUser))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserValidationException))
-                .andExpect(result -> assertEquals("Логин не должен содержать пробелы.",
-                        result.getResolvedException().getMessage()));
-    }
-
     // Проверка обновления пользователя с несуществующим id (ожидается статус 400 Bad Request и UserDoesNotExistException)
     @Test
-    public void userWhenPutNonExistentThenStatus404andUserDoesNotExistException() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenNonExistentUserWhenPutThenStatus404andUserDoesNotExistException() throws Exception {
+        //given
         postValidUser();
 
         User updatedUser = new User(2, "1@yandex.ru", "login", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
                 .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
@@ -167,113 +151,186 @@ public class UserControllerTest {
 
     // Проверка добавления пользователя с пустой электронной почтой (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPostWithBlankEmailThenStatus400() throws Exception {
+    public void givenUserWithBlankEmailWhenPostThenStatus400() throws Exception {
+        //given
         User user = new User(1, "", "login", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 post("/users")
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
     // Проверка обновления пользователя с пустой электронной почтой (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPutWithBlankEmailThenStatus400() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithBlankEmailWhenPutThenStatus400() throws Exception {
+        //given
         postValidUser();
 
         User updatedUser = new User(1, "", "login", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
     // Проверка добавления пользователя с некорректной электронной почтой (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPostWithWrongEmailThenStatus400() throws Exception {
+    public void givenUserWithWrongEmailWhenPostThenStatus400() throws Exception {
+        //given
         User user = new User(1, "email@", "login", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 post("/users")
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
     // Проверка обновления пользователя с некорректной электронной почтой (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPutWithWrongEmailThenStatus400() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithWrongEmailWhenPutThenStatus400() throws Exception {
+        //given
         postValidUser();
 
         User updatedUser = new User(1, "email@", "login", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
     // Проверка добавления пользователя с пустым логином (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPostWithBlankLoginThenStatus400() throws Exception {
+    public void givenUserWithBlankLoginWhenPostThenStatus400() throws Exception {
+        //given
         User user = new User(1, "1@yandex.ru", "", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 post("/users")
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
     // Проверка обновления пользователя с пустым логином (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPutWithBlankLoginThenStatus400() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithBlankLoginWhenPutThenStatus400() throws Exception {
+        //given
         postValidUser();
 
         User updatedUser = new User(1, "1@yandex.ru", "", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
-    // Проверка добавления пользователя с днем рождения в будущем (ожидается статус 400 Bad Request)
+    // Проверка добавления пользователя с логином, сожержащим пробел (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPostWithBirthdayInFutureLoginThenStatus400() throws Exception {
-        User user = new User(1, "1@yandex.ru", "login", "name", FUTURE_DATE);
+    public void givenUserWithSpaceInLoginWhenPostThenStatus400() throws Exception {
+        //given
+        User user = new User(1, "1@yandex.ru", "l ogin", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 post("/users")
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 
-    // Проверка обновления пользователя с днем рождения в будущем (ожидается статус 400 Bad Request)
+    // Проверка обновления пользователя с логином, сожержащим пробел (ожидается статус 400 Bad Request)
     @Test
-    public void userWhenPutWithBirthdayInFutureThenStatus400() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithSpaceInLoginWhenPutThenStatus400() throws Exception {
+        //given
         postValidUser();
 
-        User updatedUser = new User(1, "1@yandex.ru", "login", "name", FUTURE_DATE);
+        User updatedUser = new User(1, "1@yandex.ru", "l ogin", "name", BIRTHDAY);
 
+        //when
         mockMvc.perform(
                 put("/users")
                         .content(objectMapper.writeValueAsString(updatedUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )
+
+                //then
+                .andExpect(status().isBadRequest());
+    }
+
+    // Проверка добавления пользователя с днем рождения в будущем (ожидается статус 400 Bad Request)
+    @Test
+    public void givenUserWithBirthdayInFutureWhenPostThenStatus400() throws Exception {
+        //given
+        User user = new User(1, "1@yandex.ru", "login", "name", FUTURE_DATE);
+
+        //when
+        mockMvc.perform(
+                post("/users")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+
+                //then
+                .andExpect(status().isBadRequest());
+    }
+
+    // Проверка обновления пользователя с днем рождения в будущем (ожидается статус 400 Bad Request)
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void givenUserWithBirthdayInFutureWhenPutThenStatus400() throws Exception {
+        //given
+        postValidUser();
+
+        User updatedUser = new User(1, "1@yandex.ru", "login", "name", FUTURE_DATE);
+
+        //when
+        mockMvc.perform(
+                put("/users")
+                        .content(objectMapper.writeValueAsString(updatedUser))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+
+                //then
                 .andExpect(status().isBadRequest());
     }
 

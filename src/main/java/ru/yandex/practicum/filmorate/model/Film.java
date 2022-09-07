@@ -23,6 +23,7 @@ public class Film {
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Past (message = "Дата релиза фильма не может быть в будущем.")
+
     private LocalDate releaseDate;
 
     @NotNull

@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
@@ -25,7 +24,7 @@ public class UserController {
 
     // Получить список всех пользователей
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         List<User> allUsers = new ArrayList<>(users.values());
 
         log.trace("Текущее количество пользователей - {}", users.size());
@@ -34,13 +33,7 @@ public class UserController {
 
     // Добавить пользователя
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) {
-        if (user.getLogin().contains(" ")) {
-            String message = "Логин не должен содержать пробелы.";
-            log.error(message);
-            throw new UserValidationException(message);
-        }
-
+    public User add(@Valid @RequestBody User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -55,11 +48,7 @@ public class UserController {
 
     // Обновить пользователя
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
-        if (user.getLogin().contains(" ")) {
-            throw new UserValidationException("Логин не должен содержать пробелы.");
-        }
-
+    public User update(@Valid @RequestBody User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }

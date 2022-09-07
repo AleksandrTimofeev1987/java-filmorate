@@ -27,7 +27,7 @@ public class FilmController {
 
     // Получить список всех фильмов
     @GetMapping
-    public List<Film> getAllFilms() {
+    public List<Film> getAll() {
         List<Film> allFilms = new ArrayList<>(films.values());
 
         log.trace("Текущее количество фильмов - {}", films.size());
@@ -36,7 +36,7 @@ public class FilmController {
 
     // Добавить фильм
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) {
+    public Film add(@Valid @RequestBody Film film) {
         if (film.getReleaseDate().isBefore(EARLIEST_FILM)) {
             log.error("Введена дата релиза фильма ранее 28 декабря 1895 года.");
             throw new FilmValidationException("Дата релиза фильма должна быть — не раньше 28 декабря 1895 года.");
@@ -52,7 +52,7 @@ public class FilmController {
 
     // Обновить фильм
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         if (film.getReleaseDate().isBefore(EARLIEST_FILM)) {
             log.error("Введена дата релиза фильма ранее 28 декабря 1895 года.");
             throw new FilmValidationException("Дата релиза фильма должна быть — не раньше 28 декабря 1895 года.");
