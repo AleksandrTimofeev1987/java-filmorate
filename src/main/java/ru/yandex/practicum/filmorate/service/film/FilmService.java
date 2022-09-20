@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
@@ -23,23 +24,31 @@ public class FilmService {
     // Получить фильм по id
     public Film get(Integer id) {
         log.trace("Получение фильма с id - {}", id);
-        return getFilmByID(id);
+        return filmStorage.getFilms().get(id);
     }
 
     // Поставить лайк фильму
-    public String likeFilm(Integer filmId, Integer userId) {
-        Film film = getFilmByID(filmId);
+    public Film likeFilm(Integer filmId, Integer userId) {
+        Film film = get(filmId);
         film.getLikes().add(userId);
         log.trace("Пользователю с id {} понравился фильм с id {}.", userId, filmId);
-        return String.format("Пользователю с id %d понравился фильм с id %d.", userId, filmId);
+        return film;
     }
 
     // Удалить лайк фильма
-    public String dislikeFilm(Integer filmId, Integer userId) {
-        Film film = getFilmByID(filmId);
+    public Film dislikeFilm(Integer filmId, Integer userId) {
+        Film film = get(filmId);
+
+        if (!film.getLikes().contains(userId)) {
+            String message = String.format("Пользователь с id %s попытался удалить лайк у фильма с id %s, которому он не ставил лайк.", userId, filmId);
+            log.error(message);
+            throw new IncorrectPathVariableException(message);
+        }
+
         film.getLikes().remove(userId);
         log.trace("Пользователь с id {} удалил лайк у фильма с id {}.", userId, filmId);
-        return String.format("Пользователь с id %d удалил лайк у фильма с id %d.", userId, filmId);
+
+        return film;
     }
 
     // Получить count фильмов по кол-ву лайков
@@ -52,10 +61,6 @@ public class FilmService {
     }
 
     private int compare(Film f0, Film f1) {
-        return f1.getLikes().size()-f0.getLikes().size();
-    }
-
-    private Film getFilmByID(Integer id) {
-        return filmStorage.getFilms().get(id);
+        return f1.getLikes().size() - f0.getLikes().size();
     }
 }

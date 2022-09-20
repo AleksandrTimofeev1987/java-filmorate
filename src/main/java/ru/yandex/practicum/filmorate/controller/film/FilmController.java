@@ -1,20 +1,17 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.controller.film;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.FilmDoesNotExistException;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
+import ru.yandex.practicum.filmorate.controller.user.UserValidator;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
-import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,16 +21,19 @@ import java.util.List;
 
 public class FilmController {
 
-    private static final LocalDate EARLIEST_FILM = LocalDate.of(1895, 12, 28);
     private final InMemoryFilmStorage filmStorage;
     private final FilmService filmService;
     private final InMemoryUserStorage userStorage;
+    private final FilmValidator filmValidator;
+    private final UserValidator userValidator;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService, InMemoryUserStorage userStorage) {
+    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService, InMemoryUserStorage userStorage, FilmValidator filmValidator, UserValidator userValidator) {
         this.filmStorage = filmStorage;
         this.filmService = filmService;
         this.userStorage = userStorage;
+        this.filmValidator = filmValidator;
+        this.userValidator = userValidator;
     }
 
     // Получить список всех фильмов
@@ -45,7 +45,7 @@ public class FilmController {
     // Добавить фильм
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
-        validateFilmReleaseDate(film);
+        filmValidator.validateFilmReleaseDate(film);
 
         return filmStorage.add(film);
     }
@@ -53,9 +53,9 @@ public class FilmController {
     // Обновить фильм
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        validateFilmReleaseDate(film);
+        filmValidator.validateFilmReleaseDate(film);
 
-        validateFilmExists(film.getId());
+        filmValidator.validateFilmExists(film.getId());
 
         return filmStorage.update(film);
     }
@@ -64,25 +64,25 @@ public class FilmController {
     // Получить фильм по id
     @GetMapping("/{id}")
     public Film get(@PathVariable Integer id) {
-        validateFilmExists(id);
+        filmValidator.validateFilmExists(id);
 
         return filmService.get(id);
     }
 
     // Поставить лайк фильму
     @PutMapping("/{id}/like/{userId}")
-    public String likeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        validateFilmExists(id);
-        validateUserExists(userId);
+    public Film likeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+        filmValidator.validateFilmExists(id);
+        userValidator.validateUserExists(userId);
 
         return filmService.likeFilm(id, userId);
     }
 
     // Удалить лайк фильма
     @DeleteMapping("/{id}/like/{userId}")
-    public String dislikeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        validateFilmExists(id);
-        validateUserExists(userId);
+    public Film dislikeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+        filmValidator.validateFilmExists(id);
+        userValidator.validateUserExists(userId);
 
         return filmService.dislikeFilm(id, userId);
     }
@@ -97,28 +97,5 @@ public class FilmController {
         }
 
         return filmService.getMostPopularFilms(count);
-    }
-
-    private void validateFilmExists(@PathVariable Integer id) {
-        if (!filmStorage.getFilms().containsKey(id)) {
-            String message = "Фильм c таким ID не существует.";
-            log.error(message);
-            throw new FilmDoesNotExistException(message);
-        }
-    }
-
-    private void validateUserExists(@PathVariable Integer id) {
-        if (!userStorage.getUsers().containsKey(id)) {
-            String message = "Пользователя c таким ID не существует.";
-            log.error(message);
-            throw new UserDoesNotExistException(message);
-        }
-    }
-
-    private static void validateFilmReleaseDate(Film film) {
-        if (film.getReleaseDate().isBefore(EARLIEST_FILM)) {
-            log.error("Введена дата релиза фильма ранее 28 декабря 1895 года.");
-            throw new FilmValidationException("Дата релиза фильма должна быть — не раньше 28 декабря 1895 года.");
-        }
     }
 }

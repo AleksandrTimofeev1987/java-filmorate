@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -25,36 +25,36 @@ public class UserService {
     // Получить пользователя по id
     public User get(Integer id) {
         log.trace("Получение пользователя с id - {}", id);
-        return getUserByID(id);
+        return userStorage.getUsers().get(id);
     }
 
     // Добавление в друзья
-    public String addFriend(Integer userId, Integer friendId) {
-        User user = getUserByID(userId);
-        User friend = getUserByID(friendId);
+    public List<User> addFriend(Integer userId, Integer friendId) {
+        User user = get(userId);
+        User friend = get(friendId);
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
 
         log.trace("Пользователь с id {} стал другом пользователя с id {}.", userId, friendId);
-        return String.format("Пользователь с id %d стал другом пользователя с id %d.", userId, friendId);
+        return List.of(user, friend);
     }
 
     // Удаление из друзей
-    public String deleteFriend(Integer userId, Integer friendId) {
-        User user = getUserByID(userId);
-        User friend = getUserByID(friendId);
+    public List<User> deleteFriend(Integer userId, Integer friendId) {
+        User user = get(userId);
+        User friend = get(friendId);
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
 
         log.trace("Пользователь с id {} удалил из друзей пользователя с id {}.", userId, friendId);
-        return String.format("Пользователь с id %d удалил из друзей пользователя с id %d.", userId, friendId);
+        return List.of(user, friend);
     }
 
     // Получение списка всех друзей пользователя
     public List<User> getAllFriends(Integer userId) {
-        Set<Integer> friends = getUserByID(userId).getFriends();
+        Set<Integer> friends = get(userId).getFriends();
 
         log.trace("Количество друзей у пользователя с id {} составляет {}.", userId, friends.size());
         return getUsersList(friends);
@@ -62,8 +62,8 @@ public class UserService {
 
     // Получение списка друзей, общих с другим пользователем
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
-        Set<Integer> userFriends = getUserByID(userId).getFriends();
-        Set<Integer> otherFriends = getUserByID(otherId).getFriends();
+        Set<Integer> userFriends = get(userId).getFriends();
+        Set<Integer> otherFriends = get(otherId).getFriends();
 
         Set<Integer> tempSet = new HashSet<>(userFriends);
         tempSet.retainAll(otherFriends);
@@ -73,18 +73,9 @@ public class UserService {
     }
 
     private List<User> getUsersList(Set<Integer> tempSet) {
-        List<User> result = new ArrayList<>();
-
-        for (Integer friendId : tempSet) {
-            User friend = getUserByID(friendId);
-            if (friend != null) {
-                result.add(friend);
-            }
-        }
-        return result;
-    }
-
-    private User getUserByID(Integer id) {
-        return userStorage.getUsers().get(id);
+        return userStorage.getUsers().values()
+                .stream()
+                .filter(user -> tempSet.contains(user.getId()))
+                .collect(Collectors.toList());
     }
 }
