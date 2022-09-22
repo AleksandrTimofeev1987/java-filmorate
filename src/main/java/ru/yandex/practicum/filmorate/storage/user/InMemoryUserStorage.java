@@ -1,29 +1,24 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@Component
 @Slf4j
-@RequestMapping("/users")
 @Data
+public class InMemoryUserStorage implements UserStorage {
 
-public class UserController {
-
-    private int id = 0;
+    private Integer globalUserId = 0;
     private final Map<Integer, User> users = new HashMap<>();
 
     // Получить список всех пользователей
-    @GetMapping
     public List<User> getAll() {
         List<User> allUsers = new ArrayList<>(users.values());
 
@@ -32,13 +27,10 @@ public class UserController {
     }
 
     // Добавить пользователя
-    @PostMapping
-    public User add(@Valid @RequestBody User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    public User add(User user) {
+        validateNullNameAndSetLoginAsName(user);
 
-        id++;
+        Integer id = getNextId();
         user.setId(id);
         users.put(id, user);
         System.out.println(users.values());
@@ -47,23 +39,23 @@ public class UserController {
     }
 
     // Обновить пользователя
-    @PutMapping
-    public User update(@Valid @RequestBody User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    public User update(User user) {
+        validateNullNameAndSetLoginAsName(user);
 
         int id = user.getId();
-
-        if (!users.containsKey(id)) {
-            String message = "Пользователя c таким ID не существует.";
-            log.error(message);
-            throw new UserDoesNotExistException(message);
-        }
 
         users.replace(id, user);
         log.trace("Обновлен пользователь с id - {}", id);
         return user;
     }
 
+    private Integer getNextId() {
+        return ++globalUserId;
+    }
+
+    private static void validateNullNameAndSetLoginAsName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+    }
 }
