@@ -1,34 +1,32 @@
-package ru.yandex.practicum.filmorate.service.film;
+package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.FilmDoesNotExistException;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class FilmService {
+public class FilmService extends AbstractService<Film> {
 
-    private final InMemoryFilmStorage filmStorage;
-
+    UserService userService;
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
-
-    // Получить фильм по id
-    public Film get(Integer id) {
-        log.trace("Получение фильма с id - {}", id);
-        return filmStorage.getFilms().get(id);
+    public FilmService(Storage<Film> storage, UserService userService) {
+        this.storage = storage;
+        this.userService = userService;
     }
 
     // Поставить лайк фильму
-    public Film likeFilm(Integer filmId, Integer userId) {
+    public Film likeFilm(int filmId, int userId) {
+        validateDataExists(filmId);
+
+        userService.validateDataExists(userId);
         Film film = get(filmId);
         film.getLikes().add(userId);
         log.trace("Пользователю с id {} понравился фильм с id {}.", userId, filmId);
@@ -36,7 +34,9 @@ public class FilmService {
     }
 
     // Удалить лайк фильма
-    public Film dislikeFilm(Integer filmId, Integer userId) {
+    public Film dislikeFilm(int filmId, int userId) {
+        validateDataExists(filmId);
+        userService.validateDataExists(userId);
         Film film = get(filmId);
 
         if (!film.getLikes().contains(userId)) {
@@ -52,12 +52,21 @@ public class FilmService {
     }
 
     // Получить count фильмов по кол-ву лайков
-    public List<Film> getMostPopularFilms(Integer count) {
+    public List<Film> getMostPopularFilms(int count) {
         log.trace("Получение списка самых популярных фильмов размером {}.", count);
-        return filmStorage.getFilms().values().stream()
+        return storage.getAll().stream()
                 .sorted(this::compare)
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void validateDataExists(Integer id) {
+        if (!storage.validateDataExists(id)) {
+            String message = "Фильм c таким ID не существует.";
+            log.error(message);
+            throw new FilmDoesNotExistException(message);
+        }
     }
 
     private int compare(Film f0, Film f1) {

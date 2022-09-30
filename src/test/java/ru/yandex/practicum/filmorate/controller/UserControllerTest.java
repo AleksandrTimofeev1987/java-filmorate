@@ -403,6 +403,59 @@ public class UserControllerTest {
                         result.getResolvedException().getMessage()));
     }
 
+    // Проверка удаления пользователя по валидному id
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void shouldReturn200AndUserOnDeleteUserWhenValidUserId() throws Exception {
+        //given
+        postValidUser();
+        Integer id = 1;
+
+        //when
+        mockMvc.perform(
+                        delete("/users/{id}", id)
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.email").value("1@yandex.ru"))
+                .andExpect(jsonPath("$.login").value("login"))
+                .andExpect(jsonPath("$.birthday").value(BIRTHDAY.toString()))
+                .andExpect(jsonPath("$.name").value("name"))
+                .andExpect(jsonPath("$.friends.length()").value(0));
+
+        mockMvc.perform(
+                        get("/users")
+                )
+                .andExpect(jsonPath("length()").value(0));
+    }
+
+    // Проверка удаления пользователя по неправильному id (ожидается статус 404 Not Found и UserDoesNotExistException)
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void shouldReturn404OnDeleteUserWhenInvalidUserId() throws Exception {
+        //given
+        postValidUser();
+        Integer id = 2;
+
+        //when
+        mockMvc.perform(
+                        delete("/users/{id}", id)
+                )
+
+                //then
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
+                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                        result.getResolvedException().getMessage()));
+
+        mockMvc.perform(
+                        get("/users")
+                )
+                .andExpect(jsonPath("length()").value(1));
+    }
+
     // Проверка добавления в друзья
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)

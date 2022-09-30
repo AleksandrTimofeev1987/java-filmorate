@@ -1,15 +1,12 @@
-package ru.yandex.practicum.filmorate.controller.film;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.controller.user.UserValidator;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,25 +18,19 @@ import java.util.List;
 
 public class FilmController {
 
-    private final InMemoryFilmStorage filmStorage;
     private final FilmService filmService;
-    private final InMemoryUserStorage userStorage;
     private final FilmValidator filmValidator;
-    private final UserValidator userValidator;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService, InMemoryUserStorage userStorage, FilmValidator filmValidator, UserValidator userValidator) {
-        this.filmStorage = filmStorage;
+    public FilmController(FilmService filmService, FilmValidator filmValidator) {
         this.filmService = filmService;
-        this.userStorage = userStorage;
         this.filmValidator = filmValidator;
-        this.userValidator = userValidator;
     }
 
     // Получить список всех фильмов
     @GetMapping
     public List<Film> getAll() {
-        return filmStorage.getAll();
+        return filmService.getAll();
     }
 
     // Добавить фильм
@@ -47,7 +38,7 @@ public class FilmController {
     public Film add(@Valid @RequestBody Film film) {
         filmValidator.validateFilmReleaseDate(film);
 
-        return filmStorage.add(film);
+        return filmService.add(film);
     }
 
     // Обновить фильм
@@ -55,25 +46,27 @@ public class FilmController {
     public Film update(@Valid @RequestBody Film film) {
         filmValidator.validateFilmReleaseDate(film);
 
-        filmValidator.validateFilmExists(film.getId());
-
-        return filmStorage.update(film);
+        return filmService.update(film);
     }
 
 
     // Получить фильм по id
     @GetMapping("/{id}")
     public Film get(@PathVariable Integer id) {
-        filmValidator.validateFilmExists(id);
 
         return filmService.get(id);
+    }
+
+    // Удалить фильм по id
+    @DeleteMapping("/{id}")
+    public Film delete(@PathVariable Integer id) {
+
+        return filmService.delete(id);
     }
 
     // Поставить лайк фильму
     @PutMapping("/{id}/like/{userId}")
     public Film likeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        filmValidator.validateFilmExists(id);
-        userValidator.validateUserExists(userId);
 
         return filmService.likeFilm(id, userId);
     }
@@ -81,8 +74,6 @@ public class FilmController {
     // Удалить лайк фильма
     @DeleteMapping("/{id}/like/{userId}")
     public Film dislikeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        filmValidator.validateFilmExists(id);
-        userValidator.validateUserExists(userId);
 
         return filmService.dislikeFilm(id, userId);
     }

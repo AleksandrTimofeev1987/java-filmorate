@@ -1,10 +1,11 @@
-package ru.yandex.practicum.filmorate.service.user;
+package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,23 +14,33 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class UserService {
-
-    private final InMemoryUserStorage userStorage;
+public class UserService extends AbstractService<User> {
 
     @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(Storage<User> storage) {
+        this.storage = storage;
     }
 
-    // Получить пользователя по id
-    public User get(Integer id) {
-        log.trace("Получение пользователя с id - {}", id);
-        return userStorage.getUsers().get(id);
+    // Добавить пользователя
+    @Override
+    public User add(User user) {
+        validateNullNameAndSetLoginAsName(user);
+        return storage.add(user);
+    }
+
+    // Обновить пользователя
+    @Override
+    public User update(User user) {
+        validateDataExists(user.getId());
+        validateNullNameAndSetLoginAsName(user);
+        return storage.update(user);
     }
 
     // Добавление в друзья
-    public List<User> addFriend(Integer userId, Integer friendId) {
+    public List<User> addFriend(int userId, int friendId) {
+        validateDataExists(userId);
+        validateDataExists(friendId);
+
         User user = get(userId);
         User friend = get(friendId);
 
@@ -41,7 +52,10 @@ public class UserService {
     }
 
     // Удаление из друзей
-    public List<User> deleteFriend(Integer userId, Integer friendId) {
+    public List<User> deleteFriend(int userId, int friendId) {
+        validateDataExists(userId);
+        validateDataExists(friendId);
+
         User user = get(userId);
         User friend = get(friendId);
 
@@ -53,7 +67,8 @@ public class UserService {
     }
 
     // Получение списка всех друзей пользователя
-    public List<User> getAllFriends(Integer userId) {
+    public List<User> getAllFriends(int userId) {
+        validateDataExists(userId);
         Set<Integer> friends = get(userId).getFriends();
 
         log.trace("Количество друзей у пользователя с id {} составляет {}.", userId, friends.size());
@@ -61,7 +76,10 @@ public class UserService {
     }
 
     // Получение списка друзей, общих с другим пользователем
-    public List<User> getCommonFriends(Integer userId, Integer otherId) {
+    public List<User> getCommonFriends(int userId, int otherId) {
+        validateDataExists(userId);
+        validateDataExists(otherId);
+
         Set<Integer> userFriends = get(userId).getFriends();
         Set<Integer> otherFriends = get(otherId).getFriends();
 
@@ -72,10 +90,25 @@ public class UserService {
         return getUsersList(tempSet);
     }
 
+    @Override
+    public void validateDataExists(Integer id) {
+        if (!storage.validateDataExists(id)) {
+            String message = "Пользователя c таким ID не существует.";
+            log.error(message);
+            throw new UserDoesNotExistException(message);
+        }
+    }
+
     private List<User> getUsersList(Set<Integer> tempSet) {
-        return userStorage.getUsers().values()
+        return storage.getAll()
                 .stream()
                 .filter(user -> tempSet.contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    private static void validateNullNameAndSetLoginAsName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }

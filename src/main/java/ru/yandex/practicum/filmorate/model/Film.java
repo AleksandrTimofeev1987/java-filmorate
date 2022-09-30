@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -10,10 +11,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@AllArgsConstructor
-public class Film {
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class Film extends StorageData {
 
-    private int id;
+    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 
     @NotBlank (message = "Название фильма не может быть пустым.")
     private String name;
@@ -25,7 +33,6 @@ public class Film {
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Past (message = "Дата релиза фильма не может быть в будущем.")
-
     private LocalDate releaseDate;
 
     @NotNull
@@ -33,4 +40,5 @@ public class Film {
     private long duration;
 
     private final Set<Integer> likes = new HashSet<>();
+
 }

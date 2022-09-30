@@ -66,10 +66,10 @@ public class FilmControllerTest {
     public void shouldReturn200andFilmOnPostFilmWhenValidFilm() throws Exception {
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(VALID_FILM))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(VALID_FILM))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isOk())
@@ -91,10 +91,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isOk())
@@ -113,10 +113,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest())
@@ -136,10 +136,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest())
@@ -159,10 +159,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isNotFound())
@@ -179,10 +179,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -199,10 +199,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -216,10 +216,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -236,10 +236,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -253,10 +253,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -273,10 +273,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -290,10 +290,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -310,10 +310,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -327,10 +327,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -347,10 +347,10 @@ public class FilmControllerTest {
 
         //when
         mockMvc.perform(
-                put("/films")
-                        .content(objectMapper.writeValueAsString(updatedFilm))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(updatedFilm))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 //then
                 .andExpect(status().isBadRequest());
@@ -395,7 +395,59 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
                 .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
-                result.getResolvedException().getMessage()));
+                        result.getResolvedException().getMessage()));
+    }
+
+    // Проверка удаления фильма по валидному id
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void shouldReturn200AndFilmOnDeleteFilmWhenValidFilm() throws Exception {
+        //given
+        postValidFilm();
+        Integer id = 1;
+
+        //when
+        mockMvc.perform(
+                        delete("/films/{id}", id)
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("film"))
+                .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$.duration").value(1))
+                .andExpect(jsonPath("$.likes.length()").value(0));
+
+        mockMvc.perform(
+                get("/films")
+        )
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    // Проверка удаления фильма по неправильному id (ожидается статус 404 Not Found и FilmDoesNotExistException)
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void shouldReturn404OnDeleteFilmWhenInvalidFilmId() throws Exception {
+        //given
+        postValidFilm();
+        Integer id = 2;
+
+        //when
+        mockMvc.perform(
+                        delete("/films/{id}", id)
+                )
+
+                //then
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
+                .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
+                        result.getResolvedException().getMessage()));
+
+        mockMvc.perform(
+                        get("/films")
+                )
+                .andExpect(jsonPath("$.length()").value(1));
     }
 
     // Проверка постановки лайка фильму
@@ -426,7 +478,7 @@ public class FilmControllerTest {
     // Проверка постановки лайка фильму с неправильным id фильма (ожидается статус 404 Not Found и FilmDoesNotExistException)
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void shouldReturn404OnPutLikeWhenInvalidFilmIdAndUSerId() throws Exception {
+    public void shouldReturn404OnPutLikeWhenInvalidFilmIdAndUserId() throws Exception {
         //given
         postValidFilm();
         postValidUser();
@@ -453,7 +505,7 @@ public class FilmControllerTest {
         postValidFilm();
         postValidUser();
         Integer filmId = 1;
-        Integer userId = 2;
+        Integer userId = 3;
 
         //when
         mockMvc.perform(
