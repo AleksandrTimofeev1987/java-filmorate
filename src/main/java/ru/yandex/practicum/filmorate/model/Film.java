@@ -15,14 +15,6 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class Film extends StorageData {
 
-    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration) {
-        super(id);
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
     @NotBlank (message = "Название фильма не может быть пустым.")
     private String name;
 
@@ -39,6 +31,18 @@ public class Film extends StorageData {
     @Positive (message = "Продолжительность фильма должна быть положительной.")
     private long duration;
 
+    private Rating rating;
+
     private final Set<Integer> likes = new HashSet<>();
 
+    private final Set<Genre> genre = new HashSet<>();
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration, Rating rating) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rating = rating;
+    }
 }

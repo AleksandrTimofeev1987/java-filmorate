@@ -15,14 +15,6 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class User extends StorageData {
 
-    public User(Integer id, String email, String login, String name, LocalDate birthday) {
-        super(id);
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
-
     @NotBlank (message = "Email пользователя не может быть пустым.")
     @Email (message = "Email пользователя должен быть валидным.")
     private String email;
@@ -38,4 +30,12 @@ public class User extends StorageData {
     private LocalDate birthday;
 
     private final Set<Integer> friends = new HashSet<>();
+
+    public User(Integer id, String email, String login, String name, LocalDate birthday) {
+        super(id);
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
 }

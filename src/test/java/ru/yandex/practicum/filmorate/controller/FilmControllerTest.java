@@ -11,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +28,7 @@ public class FilmControllerTest {
 
     private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
     private static final LocalDate FUTURE_DATE = LocalDate.now().plusDays(1);
-    private static final Film VALID_FILM = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 1);
+    private static final Film VALID_FILM = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 1, Rating.G);
     private static final LocalDate BIRTHDAY = LocalDate.now().minusDays(1);
     private static final User VALID_USER = new User(1, "1@yandex.ru", "login", "name", BIRTHDAY);
 
@@ -87,7 +88,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "updated film", RandomString.make(200), RELEASE_DATE, 2);
+        Film updatedFilm = new Film(1, "updated film", RandomString.make(200), RELEASE_DATE, 2, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -109,7 +110,7 @@ public class FilmControllerTest {
     @Test
     public void shouldReturn400OnPostFilmWhenInvalidFilmRelease() throws Exception {
         //given
-        Film film = new Film(1, "film", RandomString.make(200), RELEASE_DATE.minusDays(1), 1);
+        Film film = new Film(1, "film", RandomString.make(200), RELEASE_DATE.minusDays(1), 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -132,7 +133,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "film", RandomString.make(200), RELEASE_DATE.minusDays(1), 1);
+        Film updatedFilm = new Film(1, "film", RandomString.make(200), RELEASE_DATE.minusDays(1), 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -155,7 +156,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(2, "updated film", RandomString.make(200), RELEASE_DATE, 1);
+        Film updatedFilm = new Film(2, "updated film", RandomString.make(200), RELEASE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -175,7 +176,7 @@ public class FilmControllerTest {
     @Test
     public void shouldReturn400OnPostFilmWhenBlankFilmName() throws Exception {
         //given
-        Film film = new Film(1, "", RandomString.make(200), RELEASE_DATE, 1);
+        Film film = new Film(1, "", RandomString.make(200), RELEASE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -195,7 +196,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "", RandomString.make(200), RELEASE_DATE, 1);
+        Film updatedFilm = new Film(1, "", RandomString.make(200), RELEASE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -212,7 +213,7 @@ public class FilmControllerTest {
     @Test
     public void shouldReturn400OnPostFilmWhenLongFilmDescription() throws Exception {
         //given
-        Film film = new Film(1, "film", RandomString.make(201), RELEASE_DATE, 1);
+        Film film = new Film(1, "film", RandomString.make(201), RELEASE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -232,7 +233,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "film", RandomString.make(201), RELEASE_DATE, 1);
+        Film updatedFilm = new Film(1, "film", RandomString.make(201), RELEASE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -249,7 +250,7 @@ public class FilmControllerTest {
     @Test
     public void shouldReturn400OnPostFilmWhenFutureFilmRelease() throws Exception {
         //given
-        Film film = new Film(1, "film", RandomString.make(200), FUTURE_DATE, 1);
+        Film film = new Film(1, "film", RandomString.make(200), FUTURE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -269,7 +270,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "film", RandomString.make(200), FUTURE_DATE, 1);
+        Film updatedFilm = new Film(1, "film", RandomString.make(200), FUTURE_DATE, 1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -286,7 +287,7 @@ public class FilmControllerTest {
     @Test
     public void shouldReturn400OnPostFilmWhenNegativeFilmDuration() throws Exception {
         //given
-        Film film = new Film(1, "film", RandomString.make(200), RELEASE_DATE, -1);
+        Film film = new Film(1, "film", RandomString.make(200), RELEASE_DATE, -1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -306,7 +307,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "film", RandomString.make(200), RELEASE_DATE, -1);
+        Film updatedFilm = new Film(1, "film", RandomString.make(200), RELEASE_DATE, -1, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -323,7 +324,7 @@ public class FilmControllerTest {
     @Test
     public void shouldReturn400OnPostFilmWhenZeroFilmDuration() throws Exception {
         //given
-        Film film = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 0);
+        Film film = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 0, Rating.PG);
 
         //when
         mockMvc.perform(
@@ -343,7 +344,7 @@ public class FilmControllerTest {
         //given
         postValidFilm();
 
-        Film updatedFilm = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 0);
+        Film updatedFilm = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 0, Rating.PG);
 
         //when
         mockMvc.perform(
