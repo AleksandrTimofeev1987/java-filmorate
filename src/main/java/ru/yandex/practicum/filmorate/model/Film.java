@@ -8,10 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @Data
 @ToString(callSuper = true)
@@ -50,5 +47,16 @@ public class Film extends StorageData {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
+    }
+
+    public Map<String,Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("film_name", name);
+        values.put("film_description", description);
+        values.put("release_date", releaseDate);
+        values.put("duration", duration);
+        values.put("rate", rate);
+        values.put("mpa_id", mpa.getId());
+        return values;
     }
 }

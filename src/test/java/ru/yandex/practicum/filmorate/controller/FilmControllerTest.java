@@ -28,7 +28,7 @@ public class FilmControllerTest {
 
     private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
     private static final LocalDate FUTURE_DATE = LocalDate.now().plusDays(1);
-    private static final MPA VALID_MPA = new MPA(1);
+    private static final MPA VALID_MPA = new MPA(1, "G");
     private static final Film VALID_FILM = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 1, VALID_MPA);
     private static final LocalDate BIRTHDAY = LocalDate.now().minusDays(1);
     private static final User VALID_USER = new User(1, "1@yandex.ru", "login", "name", BIRTHDAY);

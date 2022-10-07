@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmDoesNotExistException;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectPathVariableException;
@@ -17,7 +18,7 @@ public class FilmService extends AbstractService<Film> {
 
     UserService userService;
     @Autowired
-    public FilmService(Storage<Film> storage, UserService userService) {
+    public FilmService(@Qualifier("FilmDbStorage") Storage<Film> storage, UserService userService) {
         this.storage = storage;
         this.userService = userService;
     }

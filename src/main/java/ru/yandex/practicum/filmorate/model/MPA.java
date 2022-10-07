@@ -8,7 +8,11 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MPA extends StorageData {
-    public MPA(Integer id) {
+
+    private String name;
+
+    public MPA(Integer id, String name) {
         super(id);
+        this.name = name;
     }
 }
