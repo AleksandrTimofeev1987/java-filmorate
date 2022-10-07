@@ -57,6 +57,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$[0].name").value("film"))
                 .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$[0].duration").value(1))
+                .andExpect(jsonPath("$[0].rate").value(0))
                 .andExpect(jsonPath("$[0].likes.length()").value(0));
     }
 
@@ -77,6 +78,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.name").value("film"))
                 .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$.duration").value(1))
+                .andExpect(jsonPath("$.rate").value(0))
                 .andExpect(jsonPath("$.likes.length()").value(0));
     }
 
@@ -102,6 +104,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.name").value("updated film"))
                 .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$.duration").value(2))
+                .andExpect(jsonPath("$.rate").value(0))
                 .andExpect(jsonPath("$.likes.length()").value(0));
     }
 
@@ -375,6 +378,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.name").value("film"))
                 .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$.duration").value(1))
+                .andExpect(jsonPath("$.rate").value(0))
                 .andExpect(jsonPath("$.likes.length()").value(0));
     }
 
@@ -417,6 +421,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.name").value("film"))
                 .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$.duration").value(1))
+                .andExpect(jsonPath("$.rate").value(0))
                 .andExpect(jsonPath("$.likes.length()").value(0));
 
         mockMvc.perform(
@@ -471,6 +476,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.name").value("film"))
                 .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$.duration").value(1))
+                .andExpect(jsonPath("$.rate").value(1))
                 .andExpect(jsonPath("$.likes.length()").value(1))
                 .andExpect(jsonPath("$.likes[0]").value(1));
     }
@@ -541,6 +547,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.name").value("film"))
                 .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
                 .andExpect(jsonPath("$.duration").value(1))
+                .andExpect(jsonPath("$.rate").value(0))
                 .andExpect(jsonPath("$.likes.length()").value(0));
     }
 

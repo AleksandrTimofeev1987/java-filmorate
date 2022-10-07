@@ -29,6 +29,7 @@ public class FilmService extends AbstractService<Film> {
         userService.validateDataExists(userId);
         Film film = get(filmId);
         film.getLikes().add(userId);
+        film.setRate(film.getLikes().size());
         log.trace("Пользователю с id {} понравился фильм с id {}.", userId, filmId);
         return film;
     }
@@ -46,6 +47,7 @@ public class FilmService extends AbstractService<Film> {
         }
 
         film.getLikes().remove(userId);
+        film.setRate(film.getLikes().size());
         log.trace("Пользователь с id {} удалил лайк у фильма с id {}.", userId, filmId);
 
         return film;
@@ -69,7 +71,8 @@ public class FilmService extends AbstractService<Film> {
         }
     }
 
+    // TODO: правильно ли?
     private int compare(Film f0, Film f1) {
-        return f1.getLikes().size() - f0.getLikes().size();
+        return f0.getRate() - f1.getRate();
     }
 }
