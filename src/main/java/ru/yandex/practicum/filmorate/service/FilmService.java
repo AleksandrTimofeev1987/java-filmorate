@@ -71,7 +71,7 @@ public class FilmService extends AbstractService<Film> {
         }
     }
 
-    // TODO: правильно ли?
+    //TODO: правильно ли?
     private int compare(Film f0, Film f1) {
         return f0.getRate() - f1.getRate();
     }
