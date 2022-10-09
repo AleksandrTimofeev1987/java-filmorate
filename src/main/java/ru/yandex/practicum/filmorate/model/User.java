@@ -49,4 +49,8 @@ public class User extends StorageData {
         values.put("birthday", birthday);
         return values;
     }
+
+    public void setFriends(Set<Integer> friendsFromDB) {
+        friends.addAll(friendsFromDB);
+    }
 }

@@ -81,7 +81,16 @@
 -- FROM USERS AS u
 --     LEFT JOIN USER_FRIENDS AS uf on u.USER_ID = uf.FRIEND_ID;
 
+SELECT uf.friend_id, u.USER_ID, u.email, u.name, u.login, u.birthday
+FROM USER_FRIENDS AS uf
+LEFT JOIN users AS u ON uf.FRIEND_ID = u.USER_ID
+WHERE uf.USER_ID = ?;
 
+SELECT friend_id
+FROM user_friends
+WHERE user_id = ? and friend_id IN (SELECT friend_id
+                                    FROM user_friends
+                                    WHERE user_id = ?);
 
 
 

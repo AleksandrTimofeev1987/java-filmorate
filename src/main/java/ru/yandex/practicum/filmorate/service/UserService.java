@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.Storage;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,9 +17,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService extends AbstractService<User> {
 
+    FriendStorage friendStorage;
+
     @Autowired
-    public UserService(@Qualifier("UserDbStorage") Storage<User> storage) {
+    public UserService(@Qualifier("UserDbStorage") Storage<User> storage, FriendStorage friendStorage) {
         this.storage = storage;
+        this.friendStorage = friendStorage;
     }
 
     // Добавить пользователя
@@ -39,41 +42,48 @@ public class UserService extends AbstractService<User> {
 
     // Добавление в друзья
     public List<User> addFriend(int userId, int friendId) {
+//TODO: имплементировать разные имплементации
         validateDataExists(userId);
         validateDataExists(friendId);
-
-        User user = get(userId);
-        User friend = get(friendId);
-
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+//
+//        User user = get(userId);
+//        User friend = get(friendId);
+//
+//        user.getFriends().add(friendId);
+//        friend.getFriends().add(userId);
+        List<User> result = friendStorage.addFriend(userId, friendId);
 
         log.trace("Пользователь с id {} стал другом пользователя с id {}.", userId, friendId);
-        return List.of(user, friend);
+        return result;
     }
 
     // Удаление из друзей
     public List<User> deleteFriend(int userId, int friendId) {
         validateDataExists(userId);
         validateDataExists(friendId);
+//TODO: имплементировать разные имплементации
+//        User user = get(userId);
+//        User friend = get(friendId);
+//
+//        user.getFriends().remove(friendId);
+//        friend.getFriends().remove(userId);
 
-        User user = get(userId);
-        User friend = get(friendId);
-
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
+        List<User> result = friendStorage.deleteFriend(userId, friendId);
 
         log.trace("Пользователь с id {} удалил из друзей пользователя с id {}.", userId, friendId);
-        return List.of(user, friend);
+        return result;
     }
 
     // Получение списка всех друзей пользователя
     public List<User> getAllFriends(int userId) {
         validateDataExists(userId);
-        Set<Integer> friends = get(userId).getFriends();
+        //TODO: имплементировать разные имплементации
+        //Set<Integer> result = get(userId).getFriends();
 
-        log.trace("Количество друзей у пользователя с id {} составляет {}.", userId, friends.size());
-        return getUsersList(friends);
+        List<User> result = friendStorage.getAllFriends(userId);
+
+        log.trace("Количество друзей у пользователя с id {} составляет {}.", userId, result.size());
+        return result;
     }
 
     // Получение списка друзей, общих с другим пользователем
@@ -81,14 +91,17 @@ public class UserService extends AbstractService<User> {
         validateDataExists(userId);
         validateDataExists(otherId);
 
-        Set<Integer> userFriends = get(userId).getFriends();
-        Set<Integer> otherFriends = get(otherId).getFriends();
+        //TODO: имплементировать разные имплементации
+//        Set<Integer> userFriends = get(userId).getFriends();
+//        Set<Integer> otherFriends = get(otherId).getFriends();
 
-        Set<Integer> tempSet = new HashSet<>(userFriends);
-        tempSet.retainAll(otherFriends);
+//        Set<Integer> tempSet = new HashSet<>(userFriends);
+//        tempSet.retainAll(otherFriends);
+
+        List<User> result = friendStorage.getCommonFriends(userId, otherId);
 
         log.trace("Получение общих друзей у пользователей с id {} и {}.", userId, otherId);
-        return getUsersList(tempSet);
+        return result;
     }
 
     @Override
