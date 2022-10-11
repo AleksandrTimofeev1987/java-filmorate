@@ -31,22 +31,34 @@ public class Film extends StorageData {
     @Positive (message = "Продолжительность фильма должна быть положительной.")
     private long duration;
 
-    private int rate = 0;
+    @NotNull
+    private Integer rate = 0;
 
-    @JsonIgnore
-    private MPA mpa;
+//    @JsonIgnore
+//    private MPA mpa;
 
     private final Set<Integer> likes = new HashSet<>();
 
-    private final Set<Genre> genre = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+//    private final Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
 
-    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration, MPA mpa) {
+
+//    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration) {
+//        super(id);
+//        this.name = name;
+//        this.description = description;
+//        this.releaseDate = releaseDate;
+//        this.duration = duration;
+////        this.mpa = mpa;
+//    }
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration, int rate) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.mpa = mpa;
+        this.rate = rate;
+//        this.mpa = mpa;
     }
 
     public Map<String,Object> toMap() {
@@ -56,7 +68,15 @@ public class Film extends StorageData {
         values.put("release_date", releaseDate);
         values.put("duration", duration);
         values.put("rate", rate);
-        values.put("mpa_id", mpa.getId());
+        //values.put("mpa_id", mpa.getId());
         return values;
     }
+
+    public void setLikes(Set<Integer> likesFromDB) {
+        likes.addAll(likesFromDB);
+    }
+
+//    public void setGenre(Set<Genre> genreFromDB) {
+//        genres.addAll(genreFromDB);
+//    }
 }

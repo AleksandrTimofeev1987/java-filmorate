@@ -28,9 +28,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAll() {
-        String sql = "SELECT user_id, email, name, login, birthday " +
+        String sql = "SELECT * " +
                 "FROM users";
-        return jdbcTemplate.query(sql, RowMapper::mapRowToUser);
+        List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser);
+        result.forEach(user -> setFriends(user));
+        return result;
     }
 
     @Override
@@ -60,19 +62,14 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User get(int id) {
         User result = jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToUser, id);
-
-        String sql = "SELECT friend_id " +
-                "FROM user_friends " +
-                "WHERE user_id = ?";
-        Set<Integer> friends = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToFriendId, id));
-        result.setFriends(friends);
+        setFriends(result);
         return result;
     }
 
     @Override
     public User delete(int id) {
         String sqlDelete = "DELETE FROM users WHERE user_id = ?";
-        User deletedUser = jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToUser, id);
+        User deletedUser = get(id);
         jdbcTemplate.update(sqlDelete, id);
         return deletedUser;
     }
@@ -81,5 +78,13 @@ public class UserDbStorage implements UserStorage {
     public boolean validateDataExists(int id) {
         int count = jdbcTemplate.queryForObject(SQL_VALIDATE_EXISTS, RowMapper::mapRowToCount, id);
         return count != 0;
+    }
+
+    private void setFriends(User user) {
+        String sql = "SELECT friend_id " +
+                "FROM user_friends " +
+                "WHERE user_id = ?";
+        Set<Integer> friends = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToFriendId, user.getId()));
+        user.setFriends(friends);
     }
 }

@@ -1,19 +1,20 @@
--- // Заполнение таблицы жанров
--- INSERT INTO GENRES (GENRE)
--- VALUES ('Комедия'),
---        ('Драма'),
---        ('Мультфильм'),
---        ('Триллер'),
---        ('Документальный'),
---        ('Боевик');
---
--- // Заполнение таблицы рейтингов
--- INSERT INTO MPA (RATING)
--- VALUES ('G'),
---        ('PG'),
---        ('PG-13'),
---        ('R'),
---        ('NC-17');
+// Заполнение таблицы жанров
+INSERT INTO GENRES (GENRE)
+VALUES ('Комедия'),
+       ('Драма'),
+       ('Мультфильм'),
+       ('Триллер'),
+       ('Документальный'),
+       ('Боевик');
+
+// Заполнение таблицы рейтингов
+INSERT INTO MPA (RATING)
+VALUES ('G'),
+       ('PG'),
+       ('PG-13'),
+       ('R'),
+       ('NC-17');
+
 --
 -- // Добавление двух фильмов
 -- INSERT INTO FILMS (FILM_NAME, FILM_DESCRIPTION, RELEASE_DATE, DURATION, RATE, MPA_ID)
@@ -80,17 +81,6 @@
 -- SELECT *
 -- FROM USERS AS u
 --     LEFT JOIN USER_FRIENDS AS uf on u.USER_ID = uf.FRIEND_ID;
-
-SELECT uf.friend_id, u.USER_ID, u.email, u.name, u.login, u.birthday
-FROM USER_FRIENDS AS uf
-LEFT JOIN users AS u ON uf.FRIEND_ID = u.USER_ID
-WHERE uf.USER_ID = ?;
-
-SELECT friend_id
-FROM user_friends
-WHERE user_id = ? and friend_id IN (SELECT friend_id
-                                    FROM user_friends
-                                    WHERE user_id = ?);
 
 
 

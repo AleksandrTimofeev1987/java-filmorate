@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository("FriendStorage")
@@ -33,7 +35,7 @@ public class FriendStorage {
         String sql = "INSERT INTO user_friends(user_id, friend_id) " +
                 "VALUES (?,?)";
         jdbcTemplate.update(sql,
-                friendId, userId);
+                userId, friendId);
 
         // Получаем результат
         List<User> result = new ArrayList<>();
@@ -58,7 +60,9 @@ public class FriendStorage {
                 "FROM USER_FRIENDS AS uf " +
                 "LEFT JOIN users AS u ON uf.FRIEND_ID = u.USER_ID " +
                 "WHERE uf.USER_ID = ?";
-        return jdbcTemplate.query(sql, RowMapper::mapRowToUser, userId);
+        List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser, userId);
+        result.forEach(user -> setFriends(user));
+        return result;
     }
 
 
@@ -75,5 +79,14 @@ public class FriendStorage {
         return common_id.stream()
                 .map(id -> storage.get(id))
                 .collect(Collectors.toList());
+    }
+
+    //TODO: убрать повторение кода с UserDbStorage
+    private void setFriends(User user) {
+        String sql = "SELECT friend_id " +
+                "FROM user_friends " +
+                "WHERE user_id = ?";
+        Set<Integer> friends = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToFriendId, user.getId()));
+        user.setFriends(friends);
     }
 }

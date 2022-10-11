@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -24,5 +26,23 @@ public class RowMapper {
         return rs.getInt("count");
     }
 
+    static Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
+        int id = rs.getInt("film_id");
+        String filmName = rs.getString("film_name");
+        String filmDescription = rs.getString("film_description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        long duration = rs.getLong("duration");
+        int rate = rs.getInt("rate");
+        return new Film(id, filmName, filmDescription, releaseDate, duration, rate);
+    }
 
+    public static Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
+        int id = rs.getInt("genre_id");
+        // String genre = rs.getString("genre");
+        return new Genre(id);
+    }
+
+    public static int mapRowToLikes(ResultSet rs, int rowNum) throws SQLException {
+        return rs.getInt("user_id");
+    }
 }
