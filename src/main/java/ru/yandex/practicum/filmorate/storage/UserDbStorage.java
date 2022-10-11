@@ -80,6 +80,11 @@ public class UserDbStorage implements UserStorage {
         return count != 0;
     }
 
+    @Override
+    public List<User> getMostPopularFilms(int count) {
+        return null;
+    }
+
     private void setFriends(User user) {
         String sql = "SELECT friend_id " +
                 "FROM user_friends " +

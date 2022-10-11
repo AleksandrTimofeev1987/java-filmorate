@@ -1,4 +1,4 @@
-// Заполнение таблицы жанров
+-- Заполнение таблицы жанров
 INSERT INTO GENRES (GENRE)
 VALUES ('Комедия'),
        ('Драма'),
@@ -7,7 +7,7 @@ VALUES ('Комедия'),
        ('Документальный'),
        ('Боевик');
 
-// Заполнение таблицы рейтингов
+-- Заполнение таблицы рейтингов
 INSERT INTO MPA (RATING)
 VALUES ('G'),
        ('PG'),
@@ -15,7 +15,6 @@ VALUES ('G'),
        ('R'),
        ('NC-17');
 
---
 -- // Добавление двух фильмов
 -- INSERT INTO FILMS (FILM_NAME, FILM_DESCRIPTION, RELEASE_DATE, DURATION, RATE, MPA_ID)
 -- VALUES ('Film 1', 'Description 1', '2022-01-01', 1, 1, 1),

@@ -17,8 +17,9 @@ public class FilmDbStorage implements FilmStorage {
     private static final String SQL_VALIDATE_EXISTS = "SELECT COUNT(*) AS count " +
             "FROM films " +
             "WHERE film_id = ?";
-    private static final String SQL_GET_BY_ID = "SELECT film_id, film_name, film_description, release_date, duration, rate " +
-            "FROM films " +
+    private static final String SQL_GET_BY_ID = "SELECT f.film_id, f.film_name, f.film_description, f.release_date, f.duration, f.rate, f.mpa_id, m.rating " +
+            "FROM films AS f " +
+            "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
             "WHERE film_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
@@ -30,28 +31,45 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         String sql = "SELECT * " +
-                "FROM films";
+                "FROM films as f " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id ";
         List<Film> result = jdbcTemplate.query(sql, RowMapper::mapRowToFilm);
-        result.forEach(film -> setLikes(film));
-//        result.forEach(film -> setGenre(film));
+        result.forEach(this::setMpaName);
+        result.forEach(this::setLikes);
+        result.forEach(this::setGenre);
         return result;
     }
 
     @Override
     public Film add(Film data) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+
+        //Добавляем фильм в БД
+        SimpleJdbcInsert filmJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
-        int id = simpleJdbcInsert.executeAndReturnKey(data.toMap()).intValue();
+        int id = filmJdbcInsert.executeAndReturnKey(data.toMap()).intValue();
         data.setId(id);
-        System.out.println(data);
+
+        setMpaName(data);
+
+        //Добавляем жанры в БД
+        String sql = "INSERT INTO film_genre(film_id, genre_id) " +
+                "values (?, ?)";
+
+        for (Genre genre : data.getGenres()) {
+            jdbcTemplate.update(sql,
+                    data.getId(),
+                    genre.getId());
+        }
+
+        setGenre(data);
         return data;
     }
 
     @Override
     public Film update(Film data) {
         String sql = "UPDATE films " +
-                "SET film_name = ?, film_description = ?, release_date = ?, duration = ?, rate = ? "
+                "SET film_name = ?, film_description = ?, release_date = ?, duration = ?, rate = ?, mpa_id = ? "
                 + "WHERE film_id = ?";
         jdbcTemplate.update(sql,
                 data.getName(),
@@ -59,7 +77,10 @@ public class FilmDbStorage implements FilmStorage {
                 data.getReleaseDate(),
                 data.getDuration(),
                 data.getRate(),
+                data.getMpa().getId(),
                 data.getId());
+        setMpaName(data);
+        setGenre(data);
         return data;
     }
 
@@ -67,6 +88,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film get(int id) {
         Film result = jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToFilm, id);
         setLikes(result);
+        setGenre(result);
         return result;
     }
 
@@ -84,6 +106,29 @@ public class FilmDbStorage implements FilmStorage {
         return count != 0;
     }
 
+    public List<Film> getMostPopularFilms(int count) {
+        String sql = "SELECT * " +
+                "FROM films as f " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                "ORDER BY rate DESC " +
+                "LIMIT ?";
+        List<Film> result = jdbcTemplate.query(sql, RowMapper::mapRowToFilm, count);
+
+        result.forEach(this::setMpaName);
+        result.forEach(this::setLikes);
+        result.forEach(this::setGenre);
+
+        return result;
+    }
+
+    private void setMpaName(Film film) {
+        String sql = "SELECT rating " +
+                "FROM mpa " +
+                "WHERE mpa_id = ?";
+        String rating = jdbcTemplate.queryForObject(sql, RowMapper::mapRowToRating, film.getMpa().getId());
+        film.getMpa().setName(rating);
+    }
+
     private void setLikes(Film film) {
         String sql = "SELECT user_id " +
                 "FROM film_likes " +
@@ -91,12 +136,13 @@ public class FilmDbStorage implements FilmStorage {
         Set<Integer> likes = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToLikes, film.getId()));
         film.setLikes(likes);
     }
+
     private void setGenre(Film film) {
-        String sql = "SELECT genre_id, genre " +
+        String sql = "SELECT fg.genre_id, g.genre " +
                 "FROM film_genre AS fg " +
-                "LEFT JOIN genres AS g on fg.GENRE_ID = g.genre " +
+                "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id " +
                 "WHERE film_id = ?";
         Set<Genre> genre = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToGenre, film.getId()));
-//        film.setGenre(genre);
+        film.setGenre(genre);
     }
 }

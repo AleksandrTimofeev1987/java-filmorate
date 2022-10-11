@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -33,16 +34,29 @@ public class RowMapper {
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         long duration = rs.getLong("duration");
         int rate = rs.getInt("rate");
-        return new Film(id, filmName, filmDescription, releaseDate, duration, rate);
-    }
-
-    public static Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
-        int id = rs.getInt("genre_id");
-        // String genre = rs.getString("genre");
-        return new Genre(id);
+        MPA mpa = new MPA(rs.getInt("mpa_id"), rs.getString("rating"));
+        return new Film(id, filmName, filmDescription, releaseDate, duration, rate, mpa);
     }
 
     public static int mapRowToLikes(ResultSet rs, int rowNum) throws SQLException {
         return rs.getInt("user_id");
     }
+
+    public static String mapRowToRating(ResultSet rs, int rowNum) throws SQLException {
+        return rs.getString("rating");
+    }
+
+    public static MPA mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {
+        int id = rs.getInt("mpa_id");
+        String rating = rs.getString("rating");
+        return new MPA(id, rating);
+    }
+
+    public static Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
+        int id = rs.getInt("genre_id");
+        String genre = rs.getString("genre");
+        return new Genre(id, genre);
+    }
+
+
 }

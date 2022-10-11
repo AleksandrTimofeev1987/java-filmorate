@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Getter
 public class FriendStorage {
 
-    Storage<User> storage;
+    private final Storage<User> storage;
 
     private final JdbcTemplate jdbcTemplate;
 

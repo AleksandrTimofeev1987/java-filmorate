@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService extends AbstractService<User> {
 
-    FriendStorage friendStorage;
+    private final FriendStorage friendStorage;
 
     @Autowired
     public UserService(@Qualifier("UserDbStorage") Storage<User> storage, FriendStorage friendStorage) {
