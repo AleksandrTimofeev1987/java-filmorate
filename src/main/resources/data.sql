@@ -14,7 +14,6 @@ VALUES ('G'),
        ('PG-13'),
        ('R'),
        ('NC-17');
-
 -- // Добавление двух фильмов
 -- INSERT INTO FILMS (FILM_NAME, FILM_DESCRIPTION, RELEASE_DATE, DURATION, RATE, MPA_ID)
 -- VALUES ('Film 1', 'Description 1', '2022-01-01', 1, 1, 1),

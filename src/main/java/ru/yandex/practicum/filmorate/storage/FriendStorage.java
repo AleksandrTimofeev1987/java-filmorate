@@ -34,8 +34,7 @@ public class FriendStorage {
         // Добавляем запись о дружбе
         String sql = "INSERT INTO user_friends(user_id, friend_id) " +
                 "VALUES (?,?)";
-        jdbcTemplate.update(sql,
-                userId, friendId);
+        jdbcTemplate.update(sql, userId, friendId);
 
         // Получаем результат
         List<User> result = new ArrayList<>();
@@ -61,7 +60,7 @@ public class FriendStorage {
                 "LEFT JOIN users AS u ON uf.FRIEND_ID = u.USER_ID " +
                 "WHERE uf.USER_ID = ?";
         List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser, userId);
-        result.forEach(user -> setFriends(user));
+        result.forEach(this::setFriends);
         return result;
     }
 
@@ -77,11 +76,10 @@ public class FriendStorage {
 
         // Получаем список пользователей - общих друзей
         return common_id.stream()
-                .map(id -> storage.get(id))
+                .map(storage::get)
                 .collect(Collectors.toList());
     }
 
-    //TODO: убрать повторение кода с UserDbStorage
     private void setFriends(User user) {
         String sql = "SELECT friend_id " +
                 "FROM user_friends " +

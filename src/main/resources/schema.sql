@@ -52,7 +52,6 @@ CREATE TABLE user_friends
 (
     user_id   int REFERENCES users (USER_ID),
     friend_id int REFERENCES users (USER_ID),
-    is_confirmed boolean DEFAULT false,
     FOREIGN KEY (user_id) REFERENCES users (user_id),
     FOREIGN KEY (friend_id) REFERENCES users (user_id),
     PRIMARY KEY (user_id, friend_id)

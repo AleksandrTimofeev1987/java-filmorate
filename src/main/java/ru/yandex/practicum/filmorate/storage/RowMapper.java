@@ -42,6 +42,10 @@ public class RowMapper {
         return rs.getInt("user_id");
     }
 
+    public static int mapRowToLikedId(ResultSet rs, int rowNum) throws SQLException {
+        return rs.getInt("film_id");
+    }
+
     public static String mapRowToRating(ResultSet rs, int rowNum) throws SQLException {
         return rs.getString("rating");
     }

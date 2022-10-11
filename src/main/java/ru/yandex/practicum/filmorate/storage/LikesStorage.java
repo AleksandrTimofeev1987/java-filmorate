@@ -9,13 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 @Repository("LikesStorage")
 public class LikesStorage {
 
-    // TODO: сделать отдельный сервис?
-    private static final String SQL_GET_LIKES_COUNT = "SELECT COUNT(*) AS count " +
-            "FROM film_likes " +
-            "WHERE film_id = ?";
     private final Storage<Film> storage;
-
-
     private final JdbcTemplate jdbcTemplate;
 
 
@@ -49,10 +43,6 @@ public class LikesStorage {
 
         // Получаем результат
         return storage.get(filmId);
-    }
-
-    private Integer getRateCount(int filmId) {
-        return jdbcTemplate.queryForObject(SQL_GET_LIKES_COUNT, RowMapper::mapRowToCount, filmId);
     }
 
     private void updateRate(int filmId, boolean isIncrease) {

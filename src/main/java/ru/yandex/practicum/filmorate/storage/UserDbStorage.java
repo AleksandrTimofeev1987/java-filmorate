@@ -20,10 +20,12 @@ public class UserDbStorage implements UserStorage {
             "FROM users " +
             "WHERE user_id = ?";
     private final JdbcTemplate jdbcTemplate;
+    private final LikesStorage likesStorage;
 
     @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate, LikesStorage likesStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.likesStorage = likesStorage;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class UserDbStorage implements UserStorage {
         String sql = "SELECT * " +
                 "FROM users";
         List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser);
-        result.forEach(user -> setFriends(user));
+        result.forEach(this::setFriends);
         return result;
     }
 
@@ -68,9 +70,21 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User delete(int id) {
-        String sqlDelete = "DELETE FROM users WHERE user_id = ?";
+        //Удалаяем ссылку на пользователя из user_friends
+        String sqlDeleteFriendship = "DELETE FROM user_friends WHERE friend_id = ?";
+        jdbcTemplate.update(sqlDeleteFriendship, id);
+
+        //Удалаяем ссылку на пользователя из film_likes и обновляем rate у фильмов, которые понравились пользователю
+        String sqlGetLikedFilms = "SELECT film_id FROM film_likes WHERE user_id = ?";
+        List<Integer> likedFilms = jdbcTemplate.query(sqlGetLikedFilms, RowMapper::mapRowToLikedId, id);
+        likedFilms.forEach(filmId -> likesStorage.dislikeFilm(filmId, id));
+        String sqlDeleteLike = "DELETE FROM film_likes WHERE user_id = ?";
+        jdbcTemplate.update(sqlDeleteLike, id);
+
+        // Удаляем пользователя
+        String sqlDeleteUser = "DELETE FROM users WHERE user_id = ?";
         User deletedUser = get(id);
-        jdbcTemplate.update(sqlDelete, id);
+        jdbcTemplate.update(sqlDeleteUser, id);
         return deletedUser;
     }
 
