@@ -50,24 +50,15 @@ public class FilmDbStorage implements FilmStorage {
         int id = filmJdbcInsert.executeAndReturnKey(data.toMap()).intValue();
         data.setId(id);
 
-        setMpaName(data);
-
         //Добавляем жанры в БД
-        String sql = "INSERT INTO film_genre(film_id, genre_id) " +
-                "values (?, ?)";
+        updateGenre(data);
 
-        for (Genre genre : data.getGenres()) {
-            jdbcTemplate.update(sql,
-                    data.getId(),
-                    genre.getId());
-        }
-
-        setGenre(data);
-        return data;
+        return get(id);
     }
 
     @Override
     public Film update(Film data) {
+        // Обновляем фильм
         String sql = "UPDATE films " +
                 "SET film_name = ?, film_description = ?, release_date = ?, duration = ?, rate = ?, mpa_id = ? "
                 + "WHERE film_id = ?";
@@ -79,9 +70,26 @@ public class FilmDbStorage implements FilmStorage {
                 data.getRate(),
                 data.getMpa().getId(),
                 data.getId());
-        setMpaName(data);
-        setGenre(data);
-        return data;
+
+        //Удаляем жанры у фильма
+        String sqlDeleteGenres = "DELETE FROM film_genre WHERE film_id = ?";
+        jdbcTemplate.update(sqlDeleteGenres, data.getId());
+
+        //Добавляем новые жанры в БД
+        updateGenre(data);
+
+        return get(data.getId());
+    }
+
+    private void updateGenre(Film data) {
+        String sqlAddGenre = "INSERT INTO film_genre(film_id, genre_id) " +
+                "values (?, ?)";
+
+        for (Genre genre : data.getGenres()) {
+            jdbcTemplate.update(sqlAddGenre,
+                    data.getId(),
+                    genre.getId());
+        }
     }
 
     @Override

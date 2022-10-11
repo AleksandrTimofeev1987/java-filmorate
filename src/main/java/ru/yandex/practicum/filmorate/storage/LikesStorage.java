@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 @Repository("LikesStorage")
 public class LikesStorage {
 
-    //TODO: сделать отдельный сервис?
+    // TODO: сделать отдельный сервис?
     private static final String SQL_GET_LIKES_COUNT = "SELECT COUNT(*) AS count " +
             "FROM film_likes " +
             "WHERE film_id = ?";
@@ -33,7 +33,7 @@ public class LikesStorage {
                 filmId, userId);
 
         // Обновляем параметр rate
-        updateRate(filmId);
+        updateRate(filmId, true);
 
         // Получаем результат
         return storage.get(filmId);
@@ -45,7 +45,7 @@ public class LikesStorage {
         jdbcTemplate.update(sqlDelete, filmId, userId);
 
         // Обновляем параметр rate
-        updateRate(filmId);
+        updateRate(filmId, false);
 
         // Получаем результат
         return storage.get(filmId);
@@ -55,12 +55,19 @@ public class LikesStorage {
         return jdbcTemplate.queryForObject(SQL_GET_LIKES_COUNT, RowMapper::mapRowToCount, filmId);
     }
 
-    private void updateRate(int filmId) {
-        String sql = "UPDATE films " +
-                "SET rate = ? "
-                + "WHERE film_id = ?";
+    private void updateRate(int filmId, boolean isIncrease) {
+        String sql;
+        if (isIncrease) {
+            sql = "UPDATE films " +
+                    "SET rate = rate + 1 "
+                    + "WHERE film_id = ?";
+        } else {
+            sql = "UPDATE films " +
+                    "SET rate = rate - 1 "
+                    + "WHERE film_id = ?";
+        }
+
         jdbcTemplate.update(sql,
-                getRateCount(filmId),
                 filmId);
     }
 }
