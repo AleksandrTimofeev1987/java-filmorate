@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.List;
 public class FriendsService {
 
     private final Storage<User> storage;
-    private final FriendStorage friendStorage;
+    private final FriendDbStorage friendStorage;
 
     @Autowired
-    public FriendsService(@Qualifier("UserDbStorage") Storage<User> storage, FriendStorage friendStorage) {
+    public FriendsService(@Qualifier("UserDbStorage") Storage<User> storage, FriendDbStorage friendStorage) {
         this.storage = storage;
         this.friendStorage = friendStorage;
     }
@@ -31,12 +31,6 @@ public class FriendsService {
         log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
         validateDataExists(friendId);
         log.trace("FriendsService: Пройдена проверка наличия пользователя (потенциального друга) с ID {} в базе данных пользователей.", friendId);
-//TODO: имплементировать разные имплементации
-//        User user = get(userId);
-//        User friend = get(friendId);
-//
-//        user.getFriends().add(friendId);
-//        friend.getFriends().add(userId);
         List<User> result = friendStorage.addFriend(userId, friendId);
 
         log.trace("FriendsService: Пользователь с id {} стал другом пользователя с id {}.", userId, friendId);
@@ -50,12 +44,6 @@ public class FriendsService {
         log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
         validateDataExists(friendId);
         log.trace("FriendsService: Пройдена проверка наличия пользователя (потенциального друга) с ID {} в базе данных пользователей.", friendId);
-//TODO: имплементировать разные имплементации
-//        User user = get(userId);
-//        User friend = get(friendId);
-//
-//        user.getFriends().remove(friendId);
-//        friend.getFriends().remove(userId);
 
         List<User> result = friendStorage.deleteFriend(userId, friendId);
 
@@ -84,13 +72,6 @@ public class FriendsService {
         log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
         validateDataExists(otherId);
         log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", otherId);
-
-        //TODO: имплементировать разные имплементации
-//        Set<Integer> userFriends = get(userId).getFriends();
-//        Set<Integer> otherFriends = get(otherId).getFriends();
-
-//        Set<Integer> tempSet = new HashSet<>(userFriends);
-//        tempSet.retainAll(otherFriends);
 
         List<User> result = friendStorage.getCommonFriends(userId, otherId);
 

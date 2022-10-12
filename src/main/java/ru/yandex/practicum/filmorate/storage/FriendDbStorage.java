@@ -9,25 +9,24 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository("FriendStorage")
 @Slf4j
 @Getter
-public class FriendStorage {
+public class FriendDbStorage {
 
     private final Storage<User> storage;
-
     private final JdbcTemplate jdbcTemplate;
+    private final ResultDbEditor resultDbEditor;
 
 
     @Autowired
-    public FriendStorage(JdbcTemplate jdbcTemplate, @Qualifier("UserDbStorage") Storage<User> storage) {
+    public FriendDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("UserDbStorage") Storage<User> storage, ResultDbEditor resultDbEditor) {
         this.storage = storage;
         this.jdbcTemplate = jdbcTemplate;
+        this.resultDbEditor = resultDbEditor;
     }
 
     public List<User> addFriend(int userId, int friendId) {
@@ -67,12 +66,11 @@ public class FriendStorage {
         List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser, userId);
         log.trace("FriendStorage: Получен список всех друзей пользователя c ID - {} размером {}.", userId, result.size());
 
-        result.forEach(this::setFriends);
+        result.forEach(resultDbEditor::setFriends);
         log.trace("FriendStorage: Обновлены поля friends полученного списка всех друзей пользователя c ID - {}.", userId);
 
         return result;
     }
-
 
     public List<User> getCommonFriends(int userId, int otherId) {
         // Получаем список ID общих друзей
@@ -89,15 +87,5 @@ public class FriendStorage {
         return common_id.stream()
                 .map(storage::get)
                 .collect(Collectors.toList());
-    }
-
-    private void setFriends(User user) {
-        int id = user.getId();
-        log.trace("FriendStorage: Получен запрос на обновление поля friends пользователя c ID - {}.", id);
-        String sql = "SELECT friend_id " +
-                "FROM user_friends " +
-                "WHERE user_id = ?";
-        Set<Integer> friends = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToFriendId, id));
-        user.setFriends(friends);
     }
 }

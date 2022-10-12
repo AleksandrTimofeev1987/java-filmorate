@@ -17,7 +17,4 @@ public interface Storage<T extends StorageData> {
     T delete (int id);
 
     boolean validateDataExists(int id);
-
-    //TODO: как избавиться?
-    List<T> getMostPopularFilms(int count);
 }

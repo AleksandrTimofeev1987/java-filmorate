@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.MpaDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
 
 import java.util.List;
 
@@ -14,10 +14,10 @@ import java.util.List;
 @Slf4j
 public class MpaService {
 
-    private final MpaStorage mpaStorage;
+    private final MpaDbStorage mpaStorage;
 
     @Autowired
-    public MpaService(@Qualifier("MpaStorage") MpaStorage mpaStorage) {
+    public MpaService(@Qualifier("MpaStorage") MpaDbStorage mpaStorage) {
         this.mpaStorage = mpaStorage;
     }
 

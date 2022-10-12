@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.GenreDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
 
 import java.util.List;
 
@@ -14,10 +14,10 @@ import java.util.List;
 @Slf4j
 public class GenreService {
 
-    private final GenreStorage genreStorage;
+    private final GenreDbStorage genreStorage;
 
     @Autowired
-    public GenreService(@Qualifier("GenreStorage") GenreStorage genreStorage) {
+    public GenreService(@Qualifier("GenreStorage") GenreDbStorage genreStorage) {
         this.genreStorage = genreStorage;
     }
 

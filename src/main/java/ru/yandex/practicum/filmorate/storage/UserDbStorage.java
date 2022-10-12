@@ -7,9 +7,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Repository("UserDbStorage")
 @Slf4j
@@ -22,12 +20,14 @@ public class UserDbStorage implements UserStorage {
             "FROM users " +
             "WHERE user_id = ?";
     private final JdbcTemplate jdbcTemplate;
-    private final LikesStorage likesStorage;
+    private final LikesDbStorage likesStorage;
+    private final ResultDbEditor resultDbEditor;
 
     @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate, LikesStorage likesStorage) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate, LikesDbStorage likesStorage, ResultDbEditor resultDbEditor) {
         this.jdbcTemplate = jdbcTemplate;
         this.likesStorage = likesStorage;
+        this.resultDbEditor = resultDbEditor;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class UserDbStorage implements UserStorage {
         List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser);
         log.trace("UserDbStorage: Получен список всех пользователей из базы пользователей размером {}.", result.size());
 
-        result.forEach(this::setFriends);
+        result.forEach(resultDbEditor::setFriends);
         log.trace("UserDbStorage: Обновлены поля friends полученного списка всех пользователей.");
 
         return result;
@@ -80,7 +80,7 @@ public class UserDbStorage implements UserStorage {
         User result = jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToUser, id);
         log.trace("UserDbStorage: Получен пользователь с ID - {}.", result.getId());
 
-        setFriends(result);
+        resultDbEditor.setFriends(result);
         log.trace("UserDbStorage: Обновлено поле friends полученного пользователя.");
 
         return result;
@@ -119,20 +119,5 @@ public class UserDbStorage implements UserStorage {
         int count = jdbcTemplate.queryForObject(SQL_VALIDATE_EXISTS, RowMapper::mapRowToCount, id);
         log.trace("UserDbStorage: Получен ответ хранилища на запрос сервиса на проверку наличия пользователя с ID {} в базе данных пользователей. Наличие записей с нужным ID - {}", id, count);
         return count != 0;
-    }
-
-    @Override
-    public List<User> getMostPopularFilms(int count) {
-        return null;
-    }
-
-    private void setFriends(User user) {
-        int id = user.getId();
-        log.trace("UserDbStorage: Получен запрос на обновление поля friends пользователя c ID - {}.", id);
-        String sql = "SELECT friend_id " +
-                "FROM user_friends " +
-                "WHERE user_id = ?";
-        Set<Integer> friends = new HashSet<>(jdbcTemplate.query(sql, RowMapper::mapRowToFriendId, id));
-        user.setFriends(friends);
     }
 }

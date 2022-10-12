@@ -12,7 +12,7 @@ import java.util.List;
 @Repository("GenreStorage")
 @Slf4j
 @Getter
-public class GenreStorage {
+public class GenreDbStorage {
 
     private static final String SQL_VALIDATE_EXISTS = "SELECT COUNT(*) AS count " +
             "FROM genres " +
@@ -23,7 +23,7 @@ public class GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GenreStorage(JdbcTemplate jdbcTemplate) {
+    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

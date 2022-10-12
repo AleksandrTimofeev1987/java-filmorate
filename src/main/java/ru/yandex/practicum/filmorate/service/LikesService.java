@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.LikesStorage;
-import ru.yandex.practicum.filmorate.storage.Storage;
+import ru.yandex.practicum.filmorate.storage.LikesDbStorage;
 
 import java.util.List;
 
@@ -17,16 +16,14 @@ public class LikesService {
 
     private final UserService userService;
     private final FilmService filmService;
-    private final LikesStorage likesStorage;
-    private final Storage<Film> storage;
+    private final LikesDbStorage likesStorage;
 
 
     @Autowired
-    public LikesService(UserService userService, FilmService filmService, @Qualifier("LikesStorage") LikesStorage likesStorage, @Qualifier("FilmDbStorage") Storage<Film> storage) {
+    public LikesService(UserService userService, FilmService filmService, @Qualifier("LikesStorage") LikesDbStorage likesStorage) {
         this.userService = userService;
         this.filmService = filmService;
         this.likesStorage = likesStorage;
-        this.storage = storage;
     }
 
     // Поставить лайк фильму
@@ -36,11 +33,6 @@ public class LikesService {
         log.trace("LikesService: Пройдена валидация сервиса на наличие фильма с ID {} в базе данных.", filmId);
         userService.validateDataExists(userId);
         log.trace("LikesService: Пройдена валидация сервиса на наличие пользователя с ID {} в базе данных.", filmId);
-
-//        TODO: имплементировать разные имплементации
-//        Film film = get(filmId);
-//        film.getLikes().add(userId);
-//        film.setRate(film.getLikes().size());
 
         Film film = likesStorage.likeFilm(filmId, userId);
         log.trace("LikesService: Пользователю с id {} понравился фильм с id {}.", userId, filmId);
@@ -63,9 +55,6 @@ public class LikesService {
             throw new IncorrectPathVariableException(message);
         }
         log.trace("LikesService: Пройдена валидация сервиса на наличие лайка пользователя с ID {} у фильма с ID {}.", userId, filmId);
-//        TODO: имплементировать разные имплементации
-//        film.getLikes().remove(userId);
-//        film.setRate(film.getLikes().size());
 
         Film updatedFilm = likesStorage.dislikeFilm(filmId, userId);
 
@@ -77,15 +66,6 @@ public class LikesService {
     // Получить count фильмов по кол-ву лайков
     public List<Film> getMostPopularFilms(int count) {
         log.trace("LikesService: Получен запрос к сервису на получение списка самых популярных фильмов размером {}.", count);
-//        return storage.getAll().stream()
-//                .sorted(this::compare)
-//                .limit(count)
-//                .collect(Collectors.toList());
-        return storage.getMostPopularFilms(count);
-    }
-
-    //TODO: правильно ли?
-    private int compare(Film f0, Film f1) {
-        return f0.getRate() - f1.getRate();
+        return likesStorage.getMostPopularFilms(count);
     }
 }

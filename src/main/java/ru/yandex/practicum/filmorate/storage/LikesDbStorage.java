@@ -7,18 +7,23 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.List;
+
 @Repository("LikesStorage")
 @Slf4j
-public class LikesStorage {
+public class LikesDbStorage {
 
     private final Storage<Film> storage;
+    private final ResultDbEditor resultDbEditor;
     private final JdbcTemplate jdbcTemplate;
 
 
+
     @Autowired
-    public LikesStorage(JdbcTemplate jdbcTemplate, @Qualifier("FilmDbStorage") Storage<Film> storage) {
+    public LikesDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("FilmDbStorage") Storage<Film> storage, ResultDbEditor resultDbEditor) {
         this.storage = storage;
         this.jdbcTemplate = jdbcTemplate;
+        this.resultDbEditor = resultDbEditor;
     }
 
     public Film likeFilm(int filmId, int userId) {
@@ -68,5 +73,18 @@ public class LikesStorage {
 
         jdbcTemplate.update(sql,
                 filmId);
+    }
+
+    public List<Film> getMostPopularFilms(int count) {
+        log.trace("FilmDbStorage: Получен запрос к хранилищу на получение списка самых популярных фильмов размером {}.", count);
+        String sql = "SELECT * " +
+                "FROM films as f " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                "ORDER BY rate DESC " +
+                "LIMIT ?";
+        List<Film> result = jdbcTemplate.query(sql, RowMapper::mapRowToFilm, count);
+        log.trace("FilmDbStorage: Получен список самых популярных фильмов длиной {} при запросе списка длиной {}.", result.size(), count);
+
+        return resultDbEditor.setMpaLikesGenre(result);
     }
 }

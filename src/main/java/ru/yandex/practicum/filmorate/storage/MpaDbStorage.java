@@ -12,7 +12,7 @@ import java.util.List;
 @Repository("MpaStorage")
 @Slf4j
 @Getter
-public class MpaStorage {
+public class MpaDbStorage {
 
     private static final String SQL_VALIDATE_EXISTS = "SELECT COUNT(*) AS count " +
             "FROM mpa " +
@@ -24,7 +24,7 @@ public class MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public MpaStorage(JdbcTemplate jdbcTemplate) {
+    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

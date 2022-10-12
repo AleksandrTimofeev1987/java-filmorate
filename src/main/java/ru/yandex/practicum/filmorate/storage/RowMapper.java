@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class RowMapper {
-    static User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
+    public static User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
         int id = rs.getInt("user_id");
         String email = rs.getString("email");
         String login = rs.getString("login");
@@ -19,15 +19,15 @@ public class RowMapper {
         return new User(id, email, login, name, birthday);
     }
 
-    static Integer mapRowToFriendId(ResultSet rs, int rowNum) throws SQLException {
+    public static Integer mapRowToFriendId(ResultSet rs, int rowNum) throws SQLException {
         return rs.getInt("friend_id");
     }
 
-    static int mapRowToCount(ResultSet rs, int rowNum) throws SQLException {
+    public static int mapRowToCount(ResultSet rs, int rowNum) throws SQLException {
         return rs.getInt("count");
     }
 
-    static Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
+    public static Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
         int id = rs.getInt("film_id");
         String filmName = rs.getString("film_name");
         String filmDescription = rs.getString("film_description");
