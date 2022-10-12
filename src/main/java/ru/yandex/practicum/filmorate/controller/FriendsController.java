@@ -25,30 +25,34 @@ public class FriendsController {
     // Добавление в друзья
     @PutMapping("/{friendId}")
     public List<User> addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.trace("FriendsController: Получен запрос от пользователя c ID {} на добавление в друзья пользователя с ID {}.", id, friendId);
         if (id.equals(friendId)) {
-            String message = "Нельзя добавить себя в друзья.";
+            String message = "FriendsController: Нельзя добавить себя в друзья.";
             log.error(message);
             throw new IncorrectPathVariableException(message);
         }
-
+        log.trace("FriendsController: Запрос прошел валидацию на неравнство ID пользователя и потенциального друга.");
         return friendsService.addFriend(id, friendId);
     }
 
     // Удаление из друзей
     @DeleteMapping("/{friendId}")
     public List<User> deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.trace("FriendsController: Получен запрос от пользователя c ID {} на удаление из друзей пользователя с ID {}.", id, friendId);
         return friendsService.deleteFriend(id, friendId);
     }
 
     // Получение списка всех друзей пользователя
     @GetMapping
     public List<User> getAllFriends(@PathVariable Integer id) {
+        log.trace("FriendsController: Получен запрос на получение всех друзей пользователя c ID {}.", id);
         return friendsService.getAllFriends(id);
     }
 
     // Получение списка друзей, общих с другим пользователем
     @GetMapping("/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        log.trace("FriendsController: Получен запрос на получение общих друзей пользователей c ID {} и {}.", id, otherId);
         return friendsService.getCommonFriends(id, otherId);
     }
 }

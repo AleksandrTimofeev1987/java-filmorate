@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.model.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,8 +31,6 @@ public class FilmControllerTest {
     private static final LocalDate FUTURE_DATE = LocalDate.now().plusDays(1);
     private static final MPA VALID_MPA = new MPA(1, "G");
     private static final Film VALID_FILM = new Film(1, "film", RandomString.make(200), RELEASE_DATE, 1, 0, VALID_MPA);
-    private static final LocalDate BIRTHDAY = LocalDate.now().minusDays(1);
-    private static final User VALID_USER = new User(1, "1@yandex.ru", "login", "name", BIRTHDAY);
 
     @Autowired
     private MockMvc mockMvc;
@@ -183,7 +180,7 @@ public class FilmControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
-                .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
+                .andExpect(result -> assertEquals("FilmService: Фильм c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -414,7 +411,7 @@ public class FilmControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
-                .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
+                .andExpect(result -> assertEquals("FilmService: Фильм c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -465,7 +462,7 @@ public class FilmControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
-                .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
+                .andExpect(result -> assertEquals("FilmService: Фильм c таким ID не существует.",
                         result.getResolvedException().getMessage()));
 
         mockMvc.perform(

@@ -19,15 +19,11 @@ public class FilmService extends AbstractService<Film> {
 
     @Override
     public void validateDataExists(Integer id) {
+        log.trace("FilmService: Поступил запрос на проверку наличия фильма с ID {} в базе данных фильмов.", id);
         if (!storage.validateDataExists(id)) {
-            String message = "Фильм c таким ID не существует.";
+            String message = "FilmService: Фильм c таким ID не существует.";
             log.error(message);
             throw new FilmDoesNotExistException(message);
         }
-    }
-
-    //TODO: правильно ли?
-    private int compare(Film f0, Film f1) {
-        return f0.getRate() - f1.getRate();
     }
 }

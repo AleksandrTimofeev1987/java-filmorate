@@ -85,7 +85,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -107,7 +107,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -127,7 +127,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof IncorrectPathVariableException))
-                .andExpect(result -> assertEquals("Нельзя добавить себя в друзья.",
+                .andExpect(result -> assertEquals("FriendsController: Нельзя добавить себя в друзья.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -184,7 +184,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -208,7 +208,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -258,7 +258,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -315,7 +315,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -342,7 +342,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("FriendsService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 

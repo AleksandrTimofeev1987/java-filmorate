@@ -172,7 +172,7 @@ public class UserControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("UserService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -400,7 +400,7 @@ public class UserControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("UserService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -448,7 +448,7 @@ public class UserControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("UserService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
 
         mockMvc.perform(

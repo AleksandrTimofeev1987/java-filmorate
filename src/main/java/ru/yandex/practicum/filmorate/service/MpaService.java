@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.GenreDoesNotExistException;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.exceptions.MpaDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
@@ -24,19 +22,23 @@ public class MpaService {
     }
 
     public List<MPA> getAll() {
+        log.trace("MpaService: Получен запрос к сервису на получение всех рейтингов.");
         return mpaStorage.getAll();
     }
 
     public MPA get(Integer id) {
+        log.trace("MpaService: Получен запрос к сервису на получение рейтинга с ID - {}.", id);
         validateDataExists(id);
+        log.trace("MpaService: Пройдена валидация сервиса на наличие рейтинга с ID {} в базе данных.", id);
         return mpaStorage.get(id);
     }
 
     public void validateDataExists(Integer id) {
+        log.trace("MpaService: Поступил запрос на проверку наличия рейтинга с ID {} в базе данных рейтингов.", id);
         if (!mpaStorage.validateDataExists(id)) {
-            String message = "Жанра c таким ID не существует.";
+            String message = "MpaService: Рейтинга c таким ID не существует.";
             log.error(message);
-            throw new GenreDoesNotExistException(message);
+            throw new MpaDoesNotExistException(message);
         }
     }
 }

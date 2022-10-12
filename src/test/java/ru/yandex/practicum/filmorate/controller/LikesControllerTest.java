@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase
+@AutoConfigureTestDatabase()
 public class LikesControllerTest {
 
     private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
@@ -87,7 +87,7 @@ public class LikesControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
-                .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
+                .andExpect(result -> assertEquals("FilmService: Фильм c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -109,7 +109,7 @@ public class LikesControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("UserService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -160,7 +160,7 @@ public class LikesControllerTest {
                 //then
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof IncorrectPathVariableException))
-                .andExpect(result -> assertEquals("Пользователь с id 1 попытался удалить лайк у фильма с id 1, которому он не ставил лайк.",
+                .andExpect(result -> assertEquals("LikesService: Пользователь с id 1 попытался удалить лайк у фильма с id 1, которому он не ставил лайк.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -184,7 +184,7 @@ public class LikesControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FilmDoesNotExistException))
-                .andExpect(result -> assertEquals("Фильм c таким ID не существует.",
+                .andExpect(result -> assertEquals("FilmService: Фильм c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -208,7 +208,7 @@ public class LikesControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesNotExistException))
-                .andExpect(result -> assertEquals("Пользователя c таким ID не существует.",
+                .andExpect(result -> assertEquals("UserService: Пользователя c таким ID не существует.",
                         result.getResolvedException().getMessage()));
     }
 
@@ -275,7 +275,7 @@ public class LikesControllerTest {
                 //then
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof IncorrectParameterException))
-                .andExpect(result -> assertEquals("Параметр count должен быть положительным.",
+                .andExpect(result -> assertEquals("LikesController: Параметр count должен быть положительным.",
                         result.getResolvedException().getMessage()));
     }
 
