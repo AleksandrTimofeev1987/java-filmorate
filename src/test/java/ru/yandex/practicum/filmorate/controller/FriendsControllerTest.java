@@ -127,7 +127,7 @@ public class FriendsControllerTest {
                 //then
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof IncorrectPathVariableException))
-                .andExpect(result -> assertEquals("FriendsController: Нельзя добавить себя в друзья.",
+                .andExpect(result -> assertEquals("FriendsController: Пользователь направил запрос на добавления себя в друзья.",
                         result.getResolvedException().getMessage()));
     }
 
