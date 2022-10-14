@@ -28,12 +28,12 @@ public class LikesDbStorage {
 
     public Film likeFilm(int filmId, int userId) {
         // Добавляем запись о лайке
-        log.trace("LikesStorage: Получен запрос к хранилищу от пользователя с ID {} на лайк фильма с ID {}.", userId, filmId);
+        log.debug("LikesStorage: Получен запрос к хранилищу от пользователя с ID {} на лайк фильма с ID {}.", userId, filmId);
         String sql = "INSERT INTO film_likes(film_id, user_id) " +
                 "VALUES (?,?)";
         jdbcTemplate.update(sql,
                 filmId, userId);
-        log.trace("LikesStorage: Запись о лайке пользователя с ID {} фильму с ID {} успешно добавлена в хранилище.", userId, filmId);
+        log.debug("LikesStorage: Запись о лайке пользователя с ID {} фильму с ID {} успешно добавлена в хранилище.", userId, filmId);
 
         // Обновляем параметр rate
         updateRate(filmId, true);
@@ -44,11 +44,12 @@ public class LikesDbStorage {
     }
 
     public Film dislikeFilm(int filmId, int userId) {
+        log.debug("LikesStorage: Получен запрос к хранилищу от пользователя с ID {} на удаление лайка фильма с ID {}.", userId, filmId);
+
         // Удаляем запись о лайке
-        log.trace("LikesStorage: Получен запрос к хранилищу от пользователя с ID {} на удаление лайка фильма с ID {}.", userId, filmId);
         String sqlDelete = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlDelete, filmId, userId);
-        log.trace("LikesStorage: Запись о лайке пользователя с ID {} фильму с ID {} успешно удалена из хранилища.", userId, filmId);
+        log.debug("LikesStorage: Запись о лайке пользователя с ID {} фильму с ID {} успешно удалена из хранилища.", userId, filmId);
 
         // Обновляем параметр rate
         updateRate(filmId, false);
@@ -58,8 +59,21 @@ public class LikesDbStorage {
         return storage.get(filmId);
     }
 
+    public List<Film> getMostPopularFilms(int count) {
+        log.debug("FilmDbStorage: Получен запрос к хранилищу на получение списка самых популярных фильмов размером {}.", count);
+        String sql = "SELECT * " +
+                "FROM films as f " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                "ORDER BY rate DESC " +
+                "LIMIT ?";
+        List<Film> result = jdbcTemplate.query(sql, RowMapper::mapRowToFilm, count);
+        log.debug("FilmDbStorage: Получен список самых популярных фильмов длиной {} при запросе списка длиной {}.", result.size(), count);
+
+        return resultDbEditor.setMpaLikesGenre(result);
+    }
+
     private void updateRate(int filmId, boolean isIncrease) {
-        log.trace("LikesStorage: Получен запрос к хранилищу на обновление поля rate фильма с ID {} и параметром isIncrease = {}.", filmId, isIncrease);
+        log.debug("LikesStorage: Получен запрос к хранилищу на обновление поля rate фильма с ID {} и параметром isIncrease = {}.", filmId, isIncrease);
         String sql;
         if (isIncrease) {
             sql = "UPDATE films " +
@@ -71,20 +85,6 @@ public class LikesDbStorage {
                     + "WHERE film_id = ?";
         }
 
-        jdbcTemplate.update(sql,
-                filmId);
-    }
-
-    public List<Film> getMostPopularFilms(int count) {
-        log.trace("FilmDbStorage: Получен запрос к хранилищу на получение списка самых популярных фильмов размером {}.", count);
-        String sql = "SELECT * " +
-                "FROM films as f " +
-                "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
-                "ORDER BY rate DESC " +
-                "LIMIT ?";
-        List<Film> result = jdbcTemplate.query(sql, RowMapper::mapRowToFilm, count);
-        log.trace("FilmDbStorage: Получен список самых популярных фильмов длиной {} при запросе списка длиной {}.", result.size(), count);
-
-        return resultDbEditor.setMpaLikesGenre(result);
+        jdbcTemplate.update(sql, filmId);
     }
 }

@@ -28,14 +28,14 @@ public class MpaController {
     // Получить список всех рейтингов
     @GetMapping
     public List<MPA> getAll() {
-        log.trace("MpaController: Получен запрос на получение списка всех рейтингов.");
+        log.debug("MpaController: Получен запрос на получение списка всех рейтингов.");
         return mpaService.getAll();
     }
 
     // Получить рейтинг по id
     @GetMapping("/{id}")
     public MPA get(@PathVariable Integer id) {
-        log.trace("MpaController: Получен запрос на получение рейтинга с ID {}.", id);
+        log.debug("MpaController: Получен запрос на получение рейтинга с ID {}.", id);
         return mpaService.get(id);
     }
 }

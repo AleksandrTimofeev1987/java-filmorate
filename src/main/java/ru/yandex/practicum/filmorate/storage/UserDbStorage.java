@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 public class UserDbStorage implements UserStorage {
 
-    private static final String SQL_GET_BY_ID = "SELECT user_id, email, name, login, birthday " +
+    private static final String SQL_GET_BY_ID = "SELECT user_id, email, user_name, login, birthday " +
             "FROM users " +
             "WHERE user_id = ?";
     private static final String SQL_VALIDATE_EXISTS = "SELECT COUNT(*) AS count " +
@@ -32,11 +32,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAll() {
-        log.trace("UserDbStorage: Получен запрос к сервису на получение всех пользователей из базы пользователей.");
+        log.debug("UserDbStorage: Получен запрос к сервису на получение всех пользователей из базы пользователей.");
+
         String sql = "SELECT * " +
                 "FROM users";
         List<User> result = jdbcTemplate.query(sql, RowMapper::mapRowToUser);
-        log.trace("UserDbStorage: Получен список всех пользователей из базы пользователей размером {}.", result.size());
+        log.debug("UserDbStorage: Получен список всех пользователей из базы пользователей размером {}.", result.size());
 
         result.forEach(resultDbEditor::setFriends);
         log.trace("UserDbStorage: Обновлены поля friends полученного списка всех пользователей.");
@@ -46,12 +47,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User add(User data) {
-        log.trace("UserDbStorage: Получен запрос к хранилищу на добавление пользователя с логином {}.", data.getLogin());
+        log.debug("UserDbStorage: Получен запрос к хранилищу на добавление пользователя с логином {}.", data.getLogin());
+
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
         int id = simpleJdbcInsert.executeAndReturnKey(data.toMap()).intValue();
-        log.trace("UserDbStorage: В хранилище добавлен пользователь с ID - {}.", id);
+        log.debug("UserDbStorage: В хранилище добавлен пользователь с ID - {}.", id);
         data.setId(id);
         return get(id);
     }
@@ -59,9 +61,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User data) {
         int id = data.getId();
-        log.trace("UserDbStorage: Получен запрос к хранилищу на обновление пользователя с ID - {}.", id);
+        log.debug("UserDbStorage: Получен запрос к хранилищу на обновление пользователя с ID - {}.", id);
+
         String sql = "UPDATE users SET " +
-                "email = ?, name = ?, login = ?, birthday = ? "
+                "email = ?, user_name = ?, login = ?, birthday = ? "
                 + "WHERE user_id = ?";
         jdbcTemplate.update(sql,
                 data.getEmail(),
@@ -69,16 +72,16 @@ public class UserDbStorage implements UserStorage {
                 data.getLogin(),
                 data.getBirthday(),
                 data.getId());
-        log.trace("UserDbStorage: В хранилище обновлен пользователь с ID - {}.", id);
+        log.debug("UserDbStorage: В хранилище обновлен пользователь с ID - {}.", id);
 
         return get(id);
     }
 
     @Override
     public User get(int id) {
-        log.trace("UserDbStorage: Получен запрос к хранилищу на получение пользователя с ID - {}.", id);
+        log.debug("UserDbStorage: Получен запрос к хранилищу на получение пользователя с ID - {}.", id);
         User result = jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToUser, id);
-        log.trace("UserDbStorage: Получен пользователь с ID - {}.", result.getId());
+        log.debug("UserDbStorage: Получен пользователь с ID - {}.", result.getId());
 
         resultDbEditor.setFriends(result);
         log.trace("UserDbStorage: Обновлено поле friends полученного пользователя.");
@@ -89,12 +92,12 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User delete(int id) {
         //Удалаяем ссылку на пользователя из user_friends
-        log.trace("UserDbStorage: Получен запрос к хранилищу на удаление пользователя с ID - {}.", id);
+        log.debug("UserDbStorage: Получен запрос к хранилищу на удаление пользователя с ID - {}.", id);
         String sqlDeleteFriendship = "DELETE FROM user_friends WHERE friend_id = ?";
 
         //Удалаяем ссылку на пользователя из user_friends
         jdbcTemplate.update(sqlDeleteFriendship, id);
-        log.trace("UserDbStorage: Удалены ссылки на пользователя с ID - {} из хранилища дружбы.", id);
+        log.debug("UserDbStorage: Удалены ссылки на пользователя с ID - {} из хранилища дружбы.", id);
 
         //Удалаяем ссылку на пользователя из film_likes и обновляем rate у фильмов, которые понравились пользователю
         String sqlGetLikedFilms = "SELECT film_id FROM film_likes WHERE user_id = ?";
@@ -102,22 +105,22 @@ public class UserDbStorage implements UserStorage {
         likedFilms.forEach(filmId -> likesStorage.dislikeFilm(filmId, id));
         String sqlDeleteLike = "DELETE FROM film_likes WHERE user_id = ?";
         jdbcTemplate.update(sqlDeleteLike, id);
-        log.trace("UserDbStorage: Удалены ссылки на пользователя с ID - {} из хранилища лайков.", id);
+        log.debug("UserDbStorage: Удалены ссылки на пользователя с ID - {} из хранилища лайков.", id);
 
         // Удаляем пользователя
         String sqlDeleteUser = "DELETE FROM users WHERE user_id = ?";
         User deletedUser = get(id);
         jdbcTemplate.update(sqlDeleteUser, id);
-        log.trace("UserDbStorage: Удален пользователь с ID - {}.", deletedUser.getId());
+        log.debug("UserDbStorage: Удален пользователь с ID - {}.", deletedUser.getId());
 
         return deletedUser;
     }
 
     @Override
     public boolean validateDataExists(int id) {
-        log.trace("UserDbStorage: Поступил запрос сервиса на проверку наличия пользователя с ID {} в базе данных пользователей.", id);
+        log.debug("UserDbStorage: Поступил запрос сервиса на проверку наличия пользователя с ID {} в базе данных пользователей.", id);
         int count = jdbcTemplate.queryForObject(SQL_VALIDATE_EXISTS, RowMapper::mapRowToCount, id);
-        log.trace("UserDbStorage: Получен ответ хранилища на запрос сервиса на проверку наличия пользователя с ID {} в базе данных пользователей. Наличие записей с нужным ID - {}", id, count);
+        log.debug("UserDbStorage: Получен ответ хранилища на запрос сервиса на проверку наличия пользователя с ID {} в базе данных пользователей. Наличие записей с нужным ID - {}", id, count);
         return count != 0;
     }
 }

@@ -28,14 +28,14 @@ public class GenreController {
     // Получить список всех жанров
     @GetMapping
     public List<Genre> getAll() {
-        log.trace("GenreController: Получен запрос на получение списка всех жанров.");
+        log.debug("GenreController: Получен запрос на получение списка всех жанров.");
         return genreService.getAll();
     }
 
     // Получить жанр по id
     @GetMapping("/{id}")
     public Genre get(@PathVariable Integer id) {
-        log.trace("GenreController: Получен запрос на получение жанра с ID {}.", id);
+        log.debug("GenreController: Получен запрос на получение жанра с ID {}.", id);
         return genreService.get(id);
     }
 }

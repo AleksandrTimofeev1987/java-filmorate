@@ -26,64 +26,55 @@ public class FriendsService {
 
     // Добавление в друзья
     public List<User> addFriend(int userId, int friendId) {
-        log.trace("FriendsService: Получен запрос к сервису от пользователя c ID {} на добавление в друзья пользователя с ID {}.", userId, friendId);
+        log.debug("FriendsService: Получен запрос к сервису от пользователя c ID {} на добавление в друзья пользователя с ID {}.", userId, friendId);
         validateDataExists(userId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
         validateDataExists(friendId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя (потенциального друга) с ID {} в базе данных пользователей.", friendId);
         List<User> result = friendStorage.addFriend(userId, friendId);
 
-        log.trace("FriendsService: Пользователь с id {} стал другом пользователя с id {}.", userId, friendId);
+        log.debug("FriendsService: Пользователь с id {} стал другом пользователя с id {}.", userId, friendId);
         return result;
     }
 
     // Удаление из друзей
     public List<User> deleteFriend(int userId, int friendId) {
-        log.trace("FriendsService: Получен запрос к сервису от пользователя c ID {} на удаление из друзей пользователя с ID {}.", userId, friendId);
+        log.debug("FriendsService: Получен запрос к сервису от пользователя c ID {} на удаление из друзей пользователя с ID {}.", userId, friendId);
         validateDataExists(userId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
         validateDataExists(friendId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя (потенциального друга) с ID {} в базе данных пользователей.", friendId);
 
         List<User> result = friendStorage.deleteFriend(userId, friendId);
 
-        log.trace("FriendsService: Пользователь с id {} удалил из друзей пользователя с id {}.", userId, friendId);
+        log.debug("FriendsService: Пользователь с id {} удалил из друзей пользователя с id {}.", userId, friendId);
         return result;
     }
 
     // Получение списка всех друзей пользователя
     public List<User> getAllFriends(int userId) {
-        log.trace("FriendsService: Получен запрос к сервису на получение всех друзей пользователя c ID - {}.", userId);
+        log.debug("FriendsService: Получен запрос к сервису на получение всех друзей пользователя c ID - {}.", userId);
         validateDataExists(userId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
-        //TODO: имплементировать разные имплементации
-        //Set<Integer> result = get(userId).getFriends();
 
         List<User> result = friendStorage.getAllFriends(userId);
 
-        log.trace("FriendsService: Количество друзей у пользователя с id {} составляет {}.", userId, result.size());
+        log.debug("FriendsService: Количество друзей у пользователя с id {} составляет {}.", userId, result.size());
         return result;
     }
 
     // Получение списка друзей, общих с другим пользователем
     public List<User> getCommonFriends(int userId, int otherId) {
-        log.trace("FriendsService: Получен запрос к сервису на получение общих друзей пользователей c ID {} и {}.", userId, otherId);
+        log.debug("FriendsService: Получен запрос к сервису на получение общих друзей пользователей c ID {} и {}.", userId, otherId);
         validateDataExists(userId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", userId);
         validateDataExists(otherId);
-        log.trace("FriendsService: Пройдена проверка наличия пользователя с ID {} в базе данных пользователей.", otherId);
 
         List<User> result = friendStorage.getCommonFriends(userId, otherId);
 
-        log.trace("FriendsService: Получены общие друзья в количестве {} у пользователей с id {} и {}.", result.size(), userId, otherId);
+        log.debug("FriendsService: Получены общие друзья в количестве {} у пользователей с id {} и {}.", result.size(), userId, otherId);
         return result;
     }
 
     public void validateDataExists(Integer id) {
-        log.trace("FriendsService: Поступил запрос на проверку наличия пользователя с ID {} в базе данных пользователей.", id);
+        log.debug("FriendsService: Поступил запрос на проверку наличия пользователя с ID {} в базе данных пользователей.", id);
         if (!storage.validateDataExists(id)) {
             String message = "FriendsService: Пользователя c таким ID не существует.";
-            log.error(message);
+            log.warn(message);
             throw new UserDoesNotExistException(message);
         }
     }

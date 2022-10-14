@@ -18,8 +18,7 @@ public abstract class AbstractStorage<T extends StorageData> implements Storage<
     // Получить список всех данных
     public List<T> getAll() {
         List<T> allData = new ArrayList<>(storage.values());
-
-        log.trace("Текущее количество фильмов - {}", storage.size());
+        log.debug("AbstractStorage: Текущее количество фильмов - {}", storage.size());
         return allData;
     }
 
@@ -28,7 +27,7 @@ public abstract class AbstractStorage<T extends StorageData> implements Storage<
         int id = getNextId();
         data.setId(id);
         storage.put(data.getId(), data);
-        log.trace("Добавлены данные с id - {}", id);
+        log.debug("AbstractStorage: Добавлены данные с id - {}", id);
         return data;
     }
 
@@ -36,18 +35,18 @@ public abstract class AbstractStorage<T extends StorageData> implements Storage<
     public T update(T data) {
         int id = data.getId();
         storage.replace(id, data);
-        log.trace("Обновлен фильм с id - {}", id);
+        log.debug("AbstractStorage: Обновлен фильм с id - {}", id);
         return data;
     }
 
     // Получить данные по ID
     public T get(int id) {
-        log.trace("Получение данных с id - {}", id);
+        log.debug("AbstractStorage: Получение данных с id - {}", id);
         return storage.get(id);
     }
 
     public T delete(int id) {
-        log.trace("Удаление данных с id - {}", id);
+        log.debug("AbstractStorage: Удаление данных с id - {}", id);
         return storage.remove(id);
     }
 

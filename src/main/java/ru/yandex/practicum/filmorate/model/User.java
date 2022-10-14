@@ -45,7 +45,7 @@ public class User extends StorageData {
         Map<String, Object> values = new HashMap<>();
         values.put("email", email);
         values.put("login", login);
-        values.put("name", name);
+        values.put("user_name", name);
         values.put("birthday", birthday);
         return values;
     }

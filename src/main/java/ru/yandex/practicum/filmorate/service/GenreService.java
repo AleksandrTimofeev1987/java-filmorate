@@ -22,22 +22,21 @@ public class GenreService {
     }
 
     public List<Genre> getAll() {
-        log.trace("GenreService: Получен запрос к сервису на получение всех жанров.");
+        log.debug("GenreService: Получен запрос к сервису на получение всех жанров.");
         return genreStorage.getAll();
     }
 
     public Genre get(Integer id) {
-        log.trace("GenreService: Получен запрос к сервису на получение жанра с ID - {}.", id);
+        log.debug("GenreService: Получен запрос к сервису на получение жанра с ID - {}.", id);
         validateDataExists(id);
-        log.trace("GenreService: Пройдена валидация сервиса на наличие жанра с ID {} в базе данных.", id);
         return genreStorage.get(id);
     }
 
     public void validateDataExists(Integer id) {
-        log.trace("GenreService: Поступил запрос на проверку наличия жанра с ID {} в базе данных жанров.", id);
+        log.debug("GenreService: Поступил запрос на проверку наличия жанра с ID {} в базе данных жанров.", id);
         if (!genreStorage.validateDataExists(id)) {
             String message = "GenreService: Жанра c таким ID не существует.";
-            log.error(message);
+            log.warn(message);
             throw new GenreDoesNotExistException(message);
         }
     }

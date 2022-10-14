@@ -28,44 +28,43 @@ public class LikesService {
 
     // Поставить лайк фильму
     public Film likeFilm(int filmId, int userId) {
-        log.trace("LikesService: Получен запрос к сервису от пользователя с ID {} на лайк фильма с ID {}.", userId, filmId);
+        log.debug("LikesService: Получен запрос к сервису от пользователя с ID {} на лайк фильма с ID {}.", userId, filmId);
         filmService.validateDataExists(filmId);
-        log.trace("LikesService: Пройдена валидация сервиса на наличие фильма с ID {} в базе данных.", filmId);
         userService.validateDataExists(userId);
-        log.trace("LikesService: Пройдена валидация сервиса на наличие пользователя с ID {} в базе данных.", filmId);
 
         Film film = likesStorage.likeFilm(filmId, userId);
-        log.trace("LikesService: Пользователю с id {} понравился фильм с id {}.", userId, filmId);
+        log.debug("LikesService: Пользователю с id {} понравился фильм с id {}.", userId, filmId);
         return film;
     }
 
     // Удалить лайк фильма
     public Film dislikeFilm(int filmId, int userId) {
-        log.trace("LikesService: Получен запрос к сервису от пользователя с ID {} на удаление лайка фильма с ID {}.", userId, filmId);
+        log.debug("LikesService: Получен запрос к сервису от пользователя с ID {} на удаление лайка фильма с ID {}.", userId, filmId);
         filmService.validateDataExists(filmId);
-        log.trace("LikesService: Пройдена валидация сервиса на наличие фильма с ID {} в базе данных.", filmId);
         userService.validateDataExists(userId);
-        log.trace("LikesService: Пройдена валидация сервиса на наличие пользователя с ID {} в базе данных.", filmId);
 
         Film film = filmService.get(filmId);
 
-        if (!film.getLikes().contains(userId)) {
-            String message = String.format("LikesService: Пользователь с id %s попытался удалить лайк у фильма с id %s, которому он не ставил лайк.", userId, filmId);
-            log.error(message);
-            throw new IncorrectPathVariableException(message);
-        }
-        log.trace("LikesService: Пройдена валидация сервиса на наличие лайка пользователя с ID {} у фильма с ID {}.", userId, filmId);
+        validateUserLikedFilm(filmId, userId, film);
 
         Film updatedFilm = likesStorage.dislikeFilm(filmId, userId);
 
-        log.trace("LikesService: Пользователь с id {} удалил лайк у фильма с id {}.", userId, filmId);
-
+        log.debug("LikesService: Пользователь с id {} удалил лайк у фильма с id {}.", userId, filmId);
         return updatedFilm;
     }
 
     // Получить count фильмов по кол-ву лайков
     public List<Film> getMostPopularFilms(int count) {
-        log.trace("LikesService: Получен запрос к сервису на получение списка самых популярных фильмов размером {}.", count);
+        log.debug("LikesService: Получен запрос к сервису на получение списка самых популярных фильмов размером {}.", count);
         return likesStorage.getMostPopularFilms(count);
+    }
+
+    private static void validateUserLikedFilm(int filmId, int userId, Film film) {
+        log.debug("LikesService: Поступил запрос на проверку наличия лайка пользователя с ID {} у фильма с ID {}.", userId, filmId);
+        if (!film.getLikes().contains(userId)) {
+            String message = String.format("LikesService: Пользователь с id %s попытался удалить лайк у фильма с id %s, которому он не ставил лайк.", userId, filmId);
+            log.warn(message);
+            throw new IncorrectPathVariableException(message);
+        }
     }
 }

@@ -32,29 +32,30 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        log.trace("FilmDbStorage: Получен запрос к хранилищу на получение всех фильмов.");
+        log.debug("FilmDbStorage: Получен запрос к хранилищу на получение всех фильмов.");
         String sql = "SELECT * " +
                 "FROM films as f " +
                 "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id ";
         List<Film> result = jdbcTemplate.query(sql, RowMapper::mapRowToFilm);
-        log.trace("FilmDbStorage: Получен список всех фильмов длиной {}.", result.size());
 
+        log.debug("FilmDbStorage: Получен список всех фильмов длиной {}.", result.size());
         return resultDbEditor.setMpaLikesGenre(result);
     }
 
     @Override
     public Film add(Film data) {
         //Добавляем фильм в БД
-        log.trace("FilmDbStorage: Получен запрос к хранилищу на добавление фильма {}.", data.getName());
+        log.debug("FilmDbStorage: Получен запрос к хранилищу на добавление фильма {}.", data.getName());
         SimpleJdbcInsert filmJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
         int id = filmJdbcInsert.executeAndReturnKey(data.toMap()).intValue();
         data.setId(id);
         log.trace("FilmDbStorage: В хранилище добавлен фильм с ID - {}.", id);
+
         //Добавляем жанры в БД
         updateGenre(data);
-        log.trace("FilmDbStorage: В хранилище жанров добавлен фильм с ID - {} и его жанры.", id);
+        log.debug("FilmDbStorage: В хранилище жанров добавлен фильм с ID - {} и его жанры.", id);
 
         return get(id);
     }
@@ -63,10 +64,12 @@ public class FilmDbStorage implements FilmStorage {
     public Film update(Film data) {
         // Обновляем фильм
         int id = data.getId();
-        log.trace("FilmDbStorage: Получен запрос к хранилищу на обновление фильма с ID - {}.", id);
+        log.debug("FilmDbStorage: Получен запрос к хранилищу на обновление фильма с ID - {}.", id);
+
         String sql = "UPDATE films " +
                 "SET film_name = ?, film_description = ?, release_date = ?, duration = ?, rate = ?, mpa_id = ? "
                 + "WHERE film_id = ?";
+
         jdbcTemplate.update(sql,
                 data.getName(),
                 data.getDescription(),
@@ -78,32 +81,30 @@ public class FilmDbStorage implements FilmStorage {
         log.trace("FilmDbStorage: В хранилище обновлен фильм с ID - {}.", id);
 
         //Удаляем жанры у фильма
-        String sqlDeleteGenres = "DELETE FROM film_genre WHERE film_id = ?";
-        jdbcTemplate.update(sqlDeleteGenres, id);
-        log.trace("FilmDbStorage: В хранилище жанров удален фильм с ID - {}.", id);
+        deleteFilmGenre(id);
 
         //Добавляем новые жанры в БД
         updateGenre(data);
-        log.trace("FilmDbStorage: В хранилище жанров добавлен фильм с ID - {} и его жанры.", id);
+        log.debug("FilmDbStorage: В хранилище жанров добавлен фильм с ID - {} и его жанры.", id);
 
         return get(data.getId());
     }
 
     @Override
     public Film get(int id) {
-        log.trace("FilmDbStorage: Получен запрос к хранилищу на получение фильма с ID - {}.", id);
+        log.debug("FilmDbStorage: Получен запрос к хранилищу на получение фильма с ID - {}.", id);
         Film result = jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToFilm, id);
         log.trace("FilmDbStorage: Получен фильм с ID - {}.", result.getId());
         resultDbEditor.setLikes(result);
         log.trace("FilmDbStorage: Установлены значения списка лайков фильма с ID - {}.", result.getId());
         resultDbEditor.setGenre(result);
-        log.trace("FilmDbStorage: Установлены значения списка жанров фильма с ID - {}.", result.getId());
+        log.debug("FilmDbStorage: Установлены значения списка жанров фильма с ID - {}.", result.getId());
         return result;
     }
 
     @Override
     public Film delete(int id) {
-        log.trace("FilmDbStorage: Получен запрос к хранилищу на удаление фильма с ID - {}.", id);
+        log.debug("FilmDbStorage: Получен запрос к хранилищу на удаление фильма с ID - {}.", id);
 
         //Удаляем ссылку на фильм из film_genre
         String sqlDeleteGenre = "DELETE FROM film_genre WHERE film_id = ?";
@@ -119,21 +120,28 @@ public class FilmDbStorage implements FilmStorage {
         String sqlDelete = "DELETE FROM films WHERE film_id = ?";
         Film deletedFilm = get(id);
         jdbcTemplate.update(sqlDelete, id);
-        log.trace("FilmDbStorage: Удален фильм с ID - {}.", id);
+        log.debug("FilmDbStorage: Удален фильм с ID - {}.", id);
         return deletedFilm;
     }
 
     @Override
     public boolean validateDataExists(int id) {
-        log.trace("FilmDbStorage: Поступил запрос сервиса на проверку наличия фильма с ID {} в базе данных фильмов.", id);
+        log.debug("FilmDbStorage: Поступил запрос сервиса на проверку наличия фильма с ID {} в базе данных фильмов.", id);
         int count = jdbcTemplate.queryForObject(SQL_VALIDATE_EXISTS, RowMapper::mapRowToCount, id);
-        log.trace("FilmDbStorage: Получен ответ хранилища на запрос сервиса на проверку наличия фильма с ID {} в базе данных фильмов. Наличие записей с нужным ID - {}", id, count);
+        log.debug("FilmDbStorage: Получен ответ хранилища на запрос сервиса на проверку наличия фильма с ID {} в базе данных фильмов. Наличие записей с нужным ID - {}", id, count);
         return count != 0;
+    }
+
+    private void deleteFilmGenre(int id) {
+        log.trace("FilmDbStorage: Получен запрос на удаление фильма с ID - {} в хранилище жанров.", id);
+        String sqlDeleteGenres = "DELETE FROM film_genre WHERE film_id = ?";
+        jdbcTemplate.update(sqlDeleteGenres, id);
     }
 
     private void updateGenre(Film data) {
         int id = data.getId();
-        log.trace("FilmDbStorage: Получен запрос на обновление жанров фильма с ID - {}.", id);
+        log.debug("FilmDbStorage: Получен запрос на обновление жанров фильма с ID - {}.", id);
+
         String sqlAddGenre = "INSERT INTO film_genre(film_id, genre_id) " +
                 "values (?, ?)";
 

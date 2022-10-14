@@ -28,25 +28,23 @@ public class FilmController {
     // Получить список всех фильмов
     @GetMapping
     public List<Film> getAll() {
-        log.trace("FilmController: Получен запрос на получение списка всех фильмов.");
+        log.debug("FilmController: Получен запрос на получение списка всех фильмов.");
         return filmService.getAll();
     }
 
     // Добавить фильм
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
-        log.trace("FilmController: Получен запрос на добавление фильма {}.", film.getName());
+        log.debug("FilmController: Получен запрос на добавление фильма {}.", film.getName());
         filmValidator.validateFilmReleaseDate(film);
-        log.trace("FilmController: Фильм {} прошел валидацию даты релиза.", film.getName());
         return filmService.add(film);
     }
 
     // Обновить фильм
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        log.trace("FilmController: Получен запрос на обновление фильма {} с ID - {}.", film.getName(), film.getId());
+        log.debug("FilmController: Получен запрос на обновление фильма {} с ID - {}.", film.getName(), film.getId());
         filmValidator.validateFilmReleaseDate(film);
-        log.trace("FilmController: Обновленный фильм {} с ID {} прошел валидацию даты релиза.", film.getName(), film.getId());
         return filmService.update(film);
     }
 
@@ -54,14 +52,14 @@ public class FilmController {
     // Получить фильм по id
     @GetMapping("/{id}")
     public Film get(@PathVariable Integer id) {
-        log.trace("FilmController: Получен запрос на получение фильма с ID - {}.", id);
+        log.debug("FilmController: Получен запрос на получение фильма с ID - {}.", id);
         return filmService.get(id);
     }
 
     // Удалить фильм по id
     @DeleteMapping("/{id}")
     public Film delete(@PathVariable Integer id) {
-        log.trace("FilmController: Получен запрос на удаление фильма с ID - {}.", id);
+        log.debug("FilmController: Получен запрос на удаление фильма с ID - {}.", id);
         return filmService.delete(id);
     }
 }

@@ -22,22 +22,21 @@ public class MpaService {
     }
 
     public List<MPA> getAll() {
-        log.trace("MpaService: Получен запрос к сервису на получение всех рейтингов.");
+        log.debug("MpaService: Получен запрос к сервису на получение всех рейтингов.");
         return mpaStorage.getAll();
     }
 
     public MPA get(Integer id) {
-        log.trace("MpaService: Получен запрос к сервису на получение рейтинга с ID - {}.", id);
+        log.debug("MpaService: Получен запрос к сервису на получение рейтинга с ID - {}.", id);
         validateDataExists(id);
-        log.trace("MpaService: Пройдена валидация сервиса на наличие рейтинга с ID {} в базе данных.", id);
         return mpaStorage.get(id);
     }
 
     public void validateDataExists(Integer id) {
-        log.trace("MpaService: Поступил запрос на проверку наличия рейтинга с ID {} в базе данных рейтингов.", id);
+        log.debug("MpaService: Поступил запрос на проверку наличия рейтинга с ID {} в базе данных рейтингов.", id);
         if (!mpaStorage.validateDataExists(id)) {
             String message = "MpaService: Рейтинга c таким ID не существует.";
-            log.error(message);
+            log.warn(message);
             throw new MpaDoesNotExistException(message);
         }
     }

@@ -28,19 +28,19 @@ public class GenreDbStorage {
     }
 
     public List<Genre> getAll() {
-        log.trace("GenreStorage: Получен запрос к хранилищу на получение всех жанров.");
+        log.debug("GenreStorage: Получен запрос к хранилищу на получение всех жанров.");
         String sql = "SELECT * " +
                 "FROM genres ";
         return jdbcTemplate.query(sql, RowMapper::mapRowToGenre);
     }
 
     public Genre get(Integer id) {
-        log.trace("GenreStorage: Получен запрос к хранилищу на получение жанра с ID - {}.", id);
+        log.debug("GenreStorage: Получен запрос к хранилищу на получение жанра с ID - {}.", id);
         return jdbcTemplate.queryForObject(SQL_GET_BY_ID, RowMapper::mapRowToGenre, id);
     }
 
     public boolean validateDataExists(int id) {
-        log.trace("GenreStorage: Поступил запрос сервиса на проверку наличия жанра с ID {} в базе данных жанров.", id);
+        log.debug("GenreStorage: Поступил запрос сервиса на проверку наличия жанра с ID {} в базе данных жанров.", id);
         int count = jdbcTemplate.queryForObject(SQL_VALIDATE_EXISTS, RowMapper::mapRowToCount, id);
         log.trace("GenreStorage: Получен ответ хранилища на запрос сервиса на проверку наличия жанра с ID {} в базе данных жанров. Наличие записей с нужным ID - {}", id, count);
         return count != 0;

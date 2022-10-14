@@ -33,7 +33,7 @@ public class ResultDbEditor {
     }
 
     public void setLikes(Film film) {
-        log.trace("FilmDbStorage: Получен запрос на установление значений поля likes у фильма с ID - {}.", film.getId());
+        log.debug("FilmDbStorage: Получен запрос на установление значений поля likes у фильма с ID - {}.", film.getId());
         String sql = "SELECT user_id " +
                 "FROM film_likes " +
                 "WHERE film_id = ?";
@@ -42,7 +42,7 @@ public class ResultDbEditor {
     }
 
     public void setGenre(Film film) {
-        log.trace("FilmDbStorage: Получен запрос на установление значений поля name у жанров фильма с ID - {}.", film.getId());
+        log.debug("FilmDbStorage: Получен запрос на установление значений поля name у жанров фильма с ID - {}.", film.getId());
         String sql = "SELECT fg.genre_id, g.genre " +
                 "FROM film_genre AS fg " +
                 "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id " +
@@ -64,7 +64,7 @@ public class ResultDbEditor {
 
     public void setFriends(User user) {
         int id = user.getId();
-        log.trace("UserDbStorage: Получен запрос на обновление поля friends пользователя c ID - {}.", id);
+        log.debug("UserDbStorage: Получен запрос на обновление поля friends пользователя c ID - {}.", id);
         String sql = "SELECT friend_id " +
                 "FROM user_friends " +
                 "WHERE user_id = ?";
