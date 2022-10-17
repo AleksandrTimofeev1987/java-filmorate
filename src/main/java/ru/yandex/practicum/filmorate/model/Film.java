@@ -8,10 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @Data
 @ToString(callSuper = true)
@@ -34,21 +31,42 @@ public class Film extends StorageData {
     @Positive (message = "Продолжительность фильма должна быть положительной.")
     private long duration;
 
-    private int rate = 0;
+    @NotNull
+    private Integer rate = 0;
 
-    @JsonIgnore
+    @NotNull
     private MPA mpa;
 
     private final Set<Integer> likes = new HashSet<>();
 
-    private final Set<Genre> genre = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+    private final Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
 
-    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration, MPA mpa) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate, long duration, int rate, MPA mpa) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.rate = rate;
         this.mpa = mpa;
+    }
+
+    public Map<String,Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("film_name", name);
+        values.put("film_description", description);
+        values.put("release_date", releaseDate);
+        values.put("duration", duration);
+        values.put("rate", rate);
+        values.put("mpa_id", mpa.getId());
+        return values;
+    }
+
+    public void setLikes(Set<Integer> likesFromDB) {
+        likes.addAll(likesFromDB);
+    }
+
+    public void setGenre(Set<Genre> genreFromDB) {
+        genres.addAll(genreFromDB);
     }
 }
